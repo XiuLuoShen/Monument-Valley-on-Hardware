@@ -5,6 +5,7 @@ module moveSprite(
   input [1:0] dir,
   output [7:0] xCoordinate, // For 240x120 res...
   output [6:0] yCoordinate, // For 240x120 res
+  output [2:0] color,
   output drawChar
 );
 
@@ -41,7 +42,8 @@ module moveSprite(
     .update_pos(update_pos),
     .dir(dir),
     .X(xCoordinate),
-    .Y(yCoordinate)
+    .Y(yCoordinate),
+    .color(color)
   );
 endmodule
 
@@ -106,7 +108,8 @@ module moveSpriteDataPath(
   input [1:0] dir,
   output reg validMove,
   output reg [8:0] X,
-  output reg [7:0] Y
+  output reg [7:0] Y,
+  output reg [2:0] color
 );
   reg [7:0] newX;
   reg [6:0] newY;
@@ -137,6 +140,7 @@ module moveSpriteDataPath(
       X <= 7'd1;  // initial sprite location
       Y <= 6'd16;
       validMove <= 1'b0;
+      color <= 3'b000;
     end
     else  begin
       if (checkMove) begin
@@ -160,7 +164,15 @@ module moveSpriteDataPath(
       if (update_pos) begin
         X <= newX;
         Y <= newY;
+      end
+
+      if (drawBG) begin
+        color <= 3'b000;
         end
+      else if (drawChar) begin
+        color <= 3'b100;
+        end
+        
     end
   end
 
