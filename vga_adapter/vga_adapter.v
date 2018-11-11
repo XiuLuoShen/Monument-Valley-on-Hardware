@@ -115,7 +115,11 @@ module vga_adapter(
 	 * and is placed in the Video Memory (VideoMemory module) upon programming. Note that resetting the
 	 * VGA Adapter will not cause the Video Memory to revert to the specified image. */
 
-
+	parameter USING_DE1 = "FALSE";
+	/* If set to "TRUE" it adjust the offset of the drawing mechanism to account for the differences
+	 * between the DE2 and DE1 VGA digital to analogue converters. Set to "TRUE" if and only if
+	 * you are running your circuit on a DE1 board. */
+	
 	/*****************************************************************************/
 	/* Declare inputs and outputs.                                               */
 	/*****************************************************************************/
@@ -140,9 +144,9 @@ module vga_adapter(
 	
 	/* These outputs drive the VGA display. The VGA_CLK is also used to clock the FSM responsible for
 	 * controlling the data transferred to the DAC driving the monitor. */
-	output [7:0] VGA_R;
-	output [7:0] VGA_G;
-	output [7:0] VGA_B;
+	output [9:0] VGA_R;
+	output [9:0] VGA_G;
+	output [9:0] VGA_B;
 	output VGA_HS;
 	output VGA_VS;
 	output VGA_BLANK;
@@ -235,25 +239,15 @@ module vga_adapter(
 	 * required to set the monitor into the 640x480@60Hz display mode (also known as
 	 * the VGA mode).
 	 */
-
-	wire [9:0] r;
-	wire [9:0] g;
-	wire [9:0] b;
-	
-	/* Assign the MSBs from the controller to the VGA signals */
-	
-	assign VGA_R = r[9:2];
-	assign VGA_G = g[9:2];
-	assign VGA_B = b[9:2];
 	
 	vga_controller controller(
 			.vga_clock(clock_25),
 			.resetn(resetn),
 			.pixel_colour(to_ctrl_colour),
 			.memory_address(controller_to_video_memory_addr), 
-			.VGA_R(r),
-			.VGA_G(g),
-			.VGA_B(b),
+			.VGA_R(VGA_R),
+			.VGA_G(VGA_G),
+			.VGA_B(VGA_B),
 			.VGA_HS(VGA_HS),
 			.VGA_VS(VGA_VS),
 			.VGA_BLANK(VGA_BLANK),
@@ -263,6 +257,7 @@ module vga_adapter(
 		defparam controller.BITS_PER_COLOUR_CHANNEL  = BITS_PER_COLOUR_CHANNEL ;
 		defparam controller.MONOCHROME = MONOCHROME;
 		defparam controller.RESOLUTION = RESOLUTION;
+		defparam controller.USING_DE1 = USING_DE1;
 
 endmodule
 	

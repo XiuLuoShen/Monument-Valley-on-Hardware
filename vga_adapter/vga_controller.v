@@ -32,6 +32,11 @@ module vga_controller(	vga_clock, resetn, pixel_colour, memory_address,
 	 * to reduce the resolution for the Video Memory to fit within the on-chip memory limits.
 	 */
 	
+	parameter USING_DE1 = "FALSE";
+	/* If set to "TRUE" it adjust the offset of the drawing mechanism to account for the differences
+	 * between the DE2 and DE1 VGA digital to analogue converters. Set to "TRUE" if and only if
+	 * you are running your circuit on a DE1 board. */
+	
 	//--- Timing parameters.
 	/* Recall that the VGA specification requires a few more rows and columns are drawn
 	 * when refreshing the screen than are actually present on the screen. This is necessary to
@@ -39,15 +44,15 @@ module vga_controller(	vga_clock, resetn, pixel_colour, memory_address,
 	 * display mode other than 640x480 you will need to modify the parameters below as well
 	 * as change the frequency of the clock driving the monitor (VGA_CLK).
 	 */
-	parameter C_VERT_NUM_PIXELS  = 10'd480;
-	parameter C_VERT_SYNC_START  = 10'd493;
-	parameter C_VERT_SYNC_END    = 10'd494; //(C_VERT_SYNC_START + 2 - 1); 
-	parameter C_VERT_TOTAL_COUNT = 10'd525;
+	parameter C_VERT_NUM_PIXELS  = 11'd480;
+	parameter C_VERT_SYNC_START  = 11'd493;
+	parameter C_VERT_SYNC_END    = 11'd494; //(C_VERT_SYNC_START + 2 - 1); 
+	parameter C_VERT_TOTAL_COUNT = 11'd525;
 
-	parameter C_HORZ_NUM_PIXELS  = 10'd640;
-	parameter C_HORZ_SYNC_START  = 10'd659;
-	parameter C_HORZ_SYNC_END    = 10'd754; //(C_HORZ_SYNC_START + 96 - 1); 
-	parameter C_HORZ_TOTAL_COUNT = 10'd800;	
+	parameter C_HORZ_NUM_PIXELS  = 11'd640;
+	parameter C_HORZ_SYNC_START  = 11'd659;
+	parameter C_HORZ_SYNC_END    = 11'd754; //(C_HORZ_SYNC_START + 96 - 1); 
+	parameter C_HORZ_TOTAL_COUNT = 11'd800;	
 		
 	/*****************************************************************************/
 	/* Declare inputs and outputs.                                               */
@@ -139,7 +144,10 @@ module vga_controller(	vga_clock, resetn, pixel_colour, memory_address,
 	always @(posedge vga_clock)
 	begin
 		//- Sync Generator (ACTIVE LOW)
-		VGA_HS1 <= ~((xCounter >= C_HORZ_SYNC_START) && (xCounter <= C_HORZ_SYNC_END));
+		if (USING_DE1 == "TRUE")
+			VGA_HS1 <= ~((xCounter >= C_HORZ_SYNC_START-2) && (xCounter <= C_HORZ_SYNC_END-2));
+		else
+			VGA_HS1 <= ~((xCounter >= C_HORZ_SYNC_START) && (xCounter <= C_HORZ_SYNC_END));
 		VGA_VS1 <= ~((yCounter >= C_VERT_SYNC_START) && (yCounter <= C_VERT_SYNC_END));
 		
 		//- Current X and Y is valid pixel range
@@ -167,7 +175,13 @@ module vga_controller(	vga_clock, resetn, pixel_colour, memory_address,
 	integer index;
 	integer sub_index;
 	
-	always @(pixel_colour)
+	wire on_screen;
+	
+	assign on_screen = (USING_DE1 == "TRUE") ?
+							(({1'b0, xCounter} >= 2) & ({1'b0, xCounter} < C_HORZ_NUM_PIXELS+2) & ({1'b0, yCounter} < C_VERT_NUM_PIXELS)) :
+							(({1'b0, xCounter} >= 0) & ({1'b0, xCounter} < C_HORZ_NUM_PIXELS+2) & ({1'b0, yCounter} < C_VERT_NUM_PIXELS));
+	
+	always @(pixel_colour or on_screen)
 	begin		
 		VGA_R <= 'b0;
 		VGA_G <= 'b0;
@@ -178,9 +192,9 @@ module vga_controller(	vga_clock, resetn, pixel_colour, memory_address,
 			begin
 				for (sub_index = BITS_PER_COLOUR_CHANNEL - 1; sub_index >= 0; sub_index = sub_index - 1)
 				begin
-					VGA_R[sub_index+index] <= pixel_colour[sub_index + BITS_PER_COLOUR_CHANNEL*2];
-					VGA_G[sub_index+index] <= pixel_colour[sub_index + BITS_PER_COLOUR_CHANNEL];
-					VGA_B[sub_index+index] <= pixel_colour[sub_index];
+					VGA_R[sub_index+index] <= on_screen & pixel_colour[sub_index + BITS_PER_COLOUR_CHANNEL*2];
+					VGA_G[sub_index+index] <= on_screen & pixel_colour[sub_index + BITS_PER_COLOUR_CHANNEL];
+					VGA_B[sub_index+index] <= on_screen & pixel_colour[sub_index];
 				end
 			end	
 		end
@@ -188,9 +202,9 @@ module vga_controller(	vga_clock, resetn, pixel_colour, memory_address,
 		begin
 			for (index = 0; index < 10; index = index + 1)
 			begin
-				VGA_R[index] <= pixel_colour[0:0];
-				VGA_G[index] <= pixel_colour[0:0];
-				VGA_B[index] <= pixel_colour[0:0];
+				VGA_R[index] <= on_screen & pixel_colour[0:0];
+				VGA_G[index] <= on_screen & pixel_colour[0:0];
+				VGA_B[index] <= on_screen & pixel_colour[0:0];
 			end	
 		end
 	end
