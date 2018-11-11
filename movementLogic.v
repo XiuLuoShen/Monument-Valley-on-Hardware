@@ -3,10 +3,9 @@
 module moveSprite(
   input move, resetn, clock, ld_dir, doneChar, doneBG,
   input [1:0] dir,
-  output [7:0] xCoordinate, // For 240x120 res...
-  output [6:0] yCoordinate, // For 240x120 res
-  output [2:0] color,
-  output drawChar
+  output [8:0] xCoordinate, // For 320x240 res...
+  output [7:0] yCoordinate,
+  output drawChar, drawBG
 );
 
   wire validMove;
@@ -42,8 +41,7 @@ module moveSprite(
     .update_pos(update_pos),
     .dir(dir),
     .X(xCoordinate),
-    .Y(yCoordinate),
-    .color(color)
+    .Y(yCoordinate)
   );
 endmodule
 
@@ -108,11 +106,10 @@ module moveSpriteDataPath(
   input [1:0] dir,
   output reg validMove,
   output reg [8:0] X,
-  output reg [7:0] Y,
-  output reg [2:0] color
+  output reg [7:0] Y
 );
-  reg [7:0] newX;
-  reg [6:0] newY;
+  reg [8:0] newX;
+  reg [7:0] newY;
 
   always @(posedge clock) begin
     case (dir)
@@ -137,10 +134,9 @@ module moveSpriteDataPath(
 
   always @(posedge clock) begin
     if (!resetn) begin
-      X <= 7'd1;  // initial sprite location
-      Y <= 6'd16;
+      X <= 9'd1;  // initial sprite location
+      Y <= 8'd16;
       validMove <= 1'b0;
-      color <= 3'b000;
     end
     else  begin
       if (checkMove) begin
@@ -164,15 +160,7 @@ module moveSpriteDataPath(
       if (update_pos) begin
         X <= newX;
         Y <= newY;
-      end
-
-      if (drawBG) begin
-        color <= 3'b000;
         end
-      else if (drawChar) begin
-        color <= 3'b100;
-        end
-        
     end
   end
 
