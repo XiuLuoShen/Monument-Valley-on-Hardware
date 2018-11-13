@@ -138,20 +138,50 @@ module moveSpriteDataPath(
       Y <= 8'd16;
       validMove <= 1'b0;
     end
+
     else  begin
       if (checkMove) begin
         if (newX <= 1'b0 || newY <= 1'b0)
-          validMove = 1'b0;
-        else if (newY == newX + 9'd15)
-          if (newX <= 8'd161)
+          validMove = 1'b0; // ensures the square does not go off screen
+
+      	// starting point to first door
+        else if (newY == 9'd222 - newX) // diagonal BL to TR
+          if (newX <= 8'd122 && newX >= 8'd96)
             validMove = 1'b1;
 
-        else if (newY == 8'd173-newX)
-          if (newX <= 8'd79 && newX >= 8'd169)
+        // door to first corner
+        else if (newY == 8'd96 + newX) // diagonal TL to BR
+          if (newX >= 8'd127 && newX <= 8'd181)
             validMove = 1'b1;
 
-        else if (newY == 9'd314-newX)
-          if (newX <= 8'd149)
+        // first corner to first button
+        else if (newY == 9'd113 - newX)
+          if (newX >= 8'd125 && newX <= 8'd181) 
+            validMove = 1'b1;
+
+        // first button to moving platform
+        else if (newY == 9'd159 - newX)
+          if (newX >= 8'd125 && newX <= 8'd161)
+            validMove = 1'b1;
+
+        // moving platform to island
+        else if (newY == 9'd123 + newX)
+          if (newX >= 8'd161 && newX <= 8'd216)
+            validMove = 1'b1;
+
+        // island
+        else if (newY == 9'd178 - newX)
+          if (newX >= 8'd180 && newX <= 8'd216)
+            validMove = 1'b1;
+
+        // island to first button again
+        else if (newY == 9'd214 + newX)
+          if (newX >= 8'd125 && newX <= 8'd180)
+            validMove = 1'b1;
+
+        // top of platform to end
+        else if (newY == 9'd187 - newX)
+          if (newX >= 8'd159 && newX <= 8'd127)
             validMove = 1'b1;
 
         else validMove = 1'b0;
@@ -162,6 +192,7 @@ module moveSpriteDataPath(
         Y <= newY;
         end
     end
+
   end
 
 endmodule
