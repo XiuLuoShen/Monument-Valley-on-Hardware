@@ -139,8 +139,8 @@ module moveSpriteDataPath(
 
   always @(posedge clock) begin
     if (!resetn) begin
-      X <= 8'd96;  // initial sprite location
-      Y <= 9'd222;
+      X <= 9'd96;  // initial sprite location
+      Y <= 8'd222;
       validMove <= 1'b0;
     end
 
@@ -151,42 +151,48 @@ module moveSpriteDataPath(
 
         // starting point to first door
         else if (newY == 9'd318 - newX) // diagonal BL to TR
-          if (newX <= 8'd122 && newX >= 8'd96)
+          if (newX <= 9'd122 && newX >= 9'd96)
             validMove = 1'b1;
+
+        //
+        else if (newX == 8'd122 && newY == 8'd196)
+          newX <= 9'd127;
+          newY <= 8'd69;
+          validMove <= 1'b0;
 
         // door to first corner
         else if (newY == newX - 8'd31) // diagonal TL to BR
-          if (newX >= 8'd127 && newX <= 8'd181)
+          if (newX >= 9'd127 && newX <= 9'd181)
             validMove = 1'b1;
 
         // first corner to first button
         else if (newY == 8'd238 - newX)
-          if (newX >= 8'd125 && newX <= 8'd181)
+          if (newX >= 9'd125 && newX <= 9'd181)
             validMove = 1'b1;
 
         // first button to moving platform
         else if (newY == 8'd284 - newX)
-          if (newX >= 8'd125 && newX <= 8'd161)
+          if (newX >= 9'd125 && newX <= 9'd161)
             validMove = 1'b1;
 
         // moving platform to island
         else if (newY == newX - 8'd38)
-          if (newX >= 8'd161 && newX <= 8'd216)
+          if (newX >= 9'd161 && newX <= 9'd216)
             validMove = 1'b1;
 
         // island
         else if (newY == 8'd394 - newX)
-          if (newX >= 8'd180 && newX <= 8'd216)
+          if (newX >= 9'd180 && newX <= 9'd216)
             validMove = 1'b1;
 
         // island to first button again
         else if (newY == newX - 8'd89)
-          if (newX >= 8'd125 && newX <= 8'd180)
+          if (newX >= 9'd125 && newX <= 9'd180)
             validMove = 1'b1;
 
         // top of platform to end
         else if (newY == 8'd212 - newX)
-          if (newX >= 8'd159 && newX <= 8'd125)
+          if (newX >= 9'd159 && newX <= 9'd125)
             validMove = 1'b1;
 
         else validMove = 1'b0;
