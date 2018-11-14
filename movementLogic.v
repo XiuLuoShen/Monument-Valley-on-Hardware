@@ -1,12 +1,22 @@
 // These modules are for the FSM that work with movement
+// Need to modify so that we can use just one button to move
 
 module moveSprite(
   input move, resetn, clock, ld_dir, doneChar, doneBG,
   input [1:0] dir,
   output [8:0] xCoordinate, // For 320x240 res...
   output [7:0] yCoordinate,
-  output drawChar, drawBG
+  output drawChar, drawBG         // THESE ARE SIGNALS SENT TO THE SPRITE DRAWER FSM TELLING IT TO DRAW THE BG OR CHAR
 );
+	wire enable;
+
+  // 8 Hz enable signal, see rateDivider.v for other speeds
+	rateDivider r1(
+		.clock(clock),
+		.speed(2'b11),
+		.resetn(resetn),
+		.enableOut(enable)
+	);
 
   wire validMove;
   wire wait1, waitGo, checkMove, update_pos;
@@ -14,6 +24,7 @@ module moveSprite(
   wire [7:0] Y; // Y location of character
 
   moveSpriteControl C(
+	 .enable(enable),
     .clock(clock),
     .resetn(resetn),
     .move(move),
@@ -47,7 +58,7 @@ endmodule
 
 
 module moveSpriteControl(
-  input move, resetn, clock, ld_dir, validMove, doneChar, doneBG,
+  input move, resetn, clock, ld_dir, validMove, doneChar, doneBG, enable,
   output reg wait1, waitGo, checkMove, drawChar, drawBG, update_pos
 );
 
@@ -64,14 +75,14 @@ module moveSpriteControl(
 
   always @(*) begin // state table
     case (currentState)
-      WAIT1:         nextState = (ld_dir) ? WAITGO : WAIT1;
-      WAITGO:       nextState = (move) ? CHECK_MOVE: WAITGO;
-      CHECK_MOVE:   nextState = (validMove) ? REDRAW_BG : WAIT1;
-      REDRAW_BG:    nextState = WAIT_BG;
-      WAIT_BG:      nextState = doneBG ? UPDATE_LOC : WAIT_BG;
-      UPDATE_LOC:   nextState = DRAW_CHAR;
-      DRAW_CHAR:    nextState = WAIT_CHAR;
-      WAIT_CHAR:    nextState = doneChar? WAIT1: WAIT_CHAR;
+      WAIT1:         nextState = (ld_dir & enable) ? WAITGO : WAIT1;    // Load direction
+      WAITGO:       nextState = (move) ? CHECK_MOVE: WAITGO;            // Wait to be told to move
+      CHECK_MOVE:   nextState = (validMove) ? REDRAW_BG : WAIT1;        // Check the move
+      REDRAW_BG:    nextState = WAIT_BG;                                // Draw the BG over the currentSprite
+      WAIT_BG:      nextState = doneBG ? UPDATE_LOC : WAIT_BG;          // Wait for BG to be done drawing
+      UPDATE_LOC:   nextState = DRAW_CHAR;                              // Update the location of the character
+      DRAW_CHAR:    nextState = WAIT_CHAR;                              // Draw the character
+      WAIT_CHAR:    nextState = doneChar? WAIT1: WAIT_CHAR;             // Wait for character to be done drawing before going back to WAIT
       default:      nextState = WAIT1;
     endcase
   end
@@ -83,6 +94,7 @@ module moveSpriteControl(
     drawChar = 1'b0;
     drawBG = 1'b0;
     update_pos = 1'b0;
+
     case (currentState)
       WAIT1: wait1 = 1'b1;
       WAITGO: begin waitGo = 1'b1; checkMove = 1'b1;  end
@@ -156,7 +168,7 @@ module moveSpriteDataPath(
 
         // first corner to first button
         else if (newY == 9'd113 - newX)
-          if (newX >= 8'd125 && newX <= 8'd181) 
+          if (newX >= 8'd125 && newX <= 8'd181)
             validMove = 1'b1;
 
         // first button to moving platform

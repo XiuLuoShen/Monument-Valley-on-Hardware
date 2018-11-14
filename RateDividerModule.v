@@ -10,12 +10,12 @@ module rateDivider(clock, speed, resetn, enableOut);
     case (speed)
       0:  // use full speed (50 Mhz)
         R = 1'b0;
-      1:  // use 1 Hz
-        R = 26'd49999999;
-      2:  // use 2 Hz
-        R = 26'd24999999;
-      3:  // use 4 Hz
+      1:  // use 20 Hz
+        R = 26'd2500000;
+      2:  // use 4 Hz
         R = 26'd12499999;
+      3:  // use 8 Hz
+        R = 26'd6749999;
       default:  // use
         R = 26'd49999999;
     endcase
