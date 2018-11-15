@@ -1,7 +1,6 @@
 // This file contains the top level module for the sprite and the FSM for the spriteDrawer
-// Currently spriteDrawer redraws a teal square at the old sprite location and
+// Currently spriteDrawer attempts to redraw the BG at the old sprite location and
 // then draws a new red square (the sprite) at the new location
-// Clearing resets the screen to the background image
 
 module spriteFSM(
 	input clock, resetn, move, clear,
@@ -15,7 +14,6 @@ module spriteFSM(
 	wire doneDraw, drawChar, drawBG;				// communication signals between spriteDrawer and spriteInfo
 	wire [8:0] x_pos;
 	wire [7:0] y_pos;
-
 
 	moveSprite spriteInfo(
 		.move(move),
@@ -35,7 +33,6 @@ module spriteFSM(
 		.data_x(x_pos),
 		.data_y(y_pos),
 		.resetn(resetn),
-		.clear(clear),
 		.drawChar(drawChar),
 		.drawBG(drawBG),
 		.xCoordinate(xCoord),
@@ -59,16 +56,6 @@ module spriteDrawer(
 	output drawOnVGA, doneDraw
 	);
 
-// reg [2:0] color;
-// always @(*)begin
-//	if (drawBG)
-//			color <= 3'b011;
-//		else if (drawChar)
-//			color <= 3'b100;
-//		else
-//			color <= 3'b010;
-//	end
-
 	wire [3:0] Counter;
 	wire draw;
 	wire load_data, load_color, counterPlus, out; // enable signals
@@ -76,7 +63,8 @@ module spriteDrawer(
 	control1 C1(
 		.clk(clock),
 		.resetn(resetn),
-		.go(drawChar || drawBG),
+		.drawChar(drawChar)
+		.drawBG(drawBG),
 		.Counter(Counter),
 		.load_data(load_data),
 		.load_color(load_color),
@@ -91,7 +79,6 @@ module spriteDrawer(
 		.resetn(resetn),
 		.load_data(load_data),
 		.counterPlus(counterPlus),
-		.clear(clear),
 		.out(out),
 		.draw(draw),
 		.drawChar(drawChar),
@@ -99,7 +86,6 @@ module spriteDrawer(
 		.data_x(data_x),
 		.data_y(data_y),
 		.load_color(load_color),
-//		.colorIn(color),
 		.colorToDraw(colorToDraw),
 		.Counter(Counter),
 		.xCoordinate(xCoordinate),
@@ -109,7 +95,7 @@ module spriteDrawer(
 endmodule
 
 module control1(
-	input clk, resetn, go,
+	input clk, resetn, drawChar, drawBG,
 	input [3:0] Counter,
 	output reg load_data, load_color, counterPlus, out, draw, doneDraw);
 
@@ -118,16 +104,20 @@ module control1(
 	localparam
 					WAIT	= 3'd0,
 					PREPARE_TO_DRAW = 3'd1,
-					DRAW	= 3'd2,
-					INCREASE_COUNT 	= 3'd3;
+					GET_COLOR = 3'd2,
+					DRAW	= 3'd3,
+					INCREASE_COUNT 	= 3'd4,
+					DONE = 3'd5;
 
 	always @(*)
 	begin: state_table
 		case (current_state)
 			WAIT:	next_state = go? PREPARE_TO_DRAW: WAIT;
-			PREPARE_TO_DRAW:		next_state = DRAW; // load x and y into the coordinate registers
+			PREPARE_TO_DRAW_CHAR:		next_state = GET_COLOR; // load x and y into the coordinate registers
+			GET_COLOR: next_state = DRAW;
 			DRAW:		next_state = INCREASE_COUNT;						// set plot to 1
-			INCREASE_COUNT:	next_state = (Counter == 4'd15)? WAIT : PREPARE_TO_DRAW;
+			INCREASE_COUNT:	next_state = (Counter == 4'd15)? DONE : PREPARE_TO_DRAW;
+			DONE:	next_state = (drawChar) ? DONE: WAIT;
 		endcase
 	end
 
@@ -143,19 +133,23 @@ module control1(
 
 		case (current_state)
 			WAIT:	begin
-						doneDraw = 1'b1;
 						load_data = 1'b1;
-						load_color = 1'b1;
 						end
+
 			PREPARE_TO_DRAW: begin
 						out = 1'b1;
 						end
+			GET_COLOR: load_color = 1'b1;
+
 			DRAW:		begin
 						draw = 1'b1;
 						end
+
 			INCREASE_COUNT: begin
 						counterPlus = 1'b1;
 						end
+
+			DONE:	doneDraw = 1'b1;
 		endcase
 	end
 
@@ -170,7 +164,7 @@ endmodule
 
 
 module datapath1(
-	input clk, resetn, drawBG, drawChar, clear								// inputs from outside the FSM
+	input clk, resetn, drawBG, drawChar, // inputs from outside the FSM
 	input load_data, load_color, counterPlus, out, draw,
 	input [8:0] data_x,
 	input [7:0] data_y,
@@ -184,20 +178,22 @@ module datapath1(
 
 	reg [8:0] X;
 	reg [7:0] Y;
-	reg [16:0] counter_clear;
+
 	wire [2:0] background_color;
 	reg [2:0] color;			// the color of the current pixel we're trying to draw
 	// this is not the output for insurance, instead the color output is loaded from this
 
 	getBackgroundPixel bg(.clock(clk), .X(X + Counter[1:0]), .Y(Y + Counter[3:2]), .color(background_color));
 
+	// should this use the clock as well?
 	always @(*) begin
 		if (drawBG)
 			color = background_color;
+		else if (drawChar)
+			color = 3'b100;
 		else
-			color = 3'b110;
+			color = 3'b100;
 	end
-
 
 
 	always @(posedge clk) begin
@@ -206,22 +202,9 @@ module datapath1(
 			Y <= 8'd16;
 			colorToDraw <= background_color;			// hmm maybe use nonblocking statements...
 			Counter <= 4'b0;
-			counter_clear <= 17'b0;
 			drawOnVGA <= 1'b0;
 			xCoordinate <= 9'd1;
 			yCoordinate <= 8'd16;
-		end
-		else if (clear) begin
-			Counter <= 4'b0;
-			X <= counter_clear[8:0];				// the next 3 lines aren't unblocking for the sake of getting info as fast as possible and changing immediately
-			Y <= counter_clear [16:9];			// this shouldn't have any effect on the functionality
-			colorToDraw <= background_color;
-			xCoordinate <= counter_clear[8:0];
-			yCoordinate <= counter_clear[16:9];
-			if (counter_clear[16:9] < 9'd240) begin		// This will allow the counter to draw from row 0 to 239
-				counter_clear <= counter_clear + 1'b1;
-			end
-			drawOnVGA <= 1'b1;
 		end
 
 		else begin
@@ -231,23 +214,26 @@ module datapath1(
 				Counter <= 4'b0;
 			end
 
-			if (load_color) begin
-				colorToDraw <= colorIn;
+			if (load_color && drawBG) begin
+				colorToDraw <= background_color;
+			end
+			else if (load_color) begin
+				colorToDraw <= color;
 			end
 
 			if (counterPlus) begin
 				Counter <= Counter +1'b1;
 			end
 
-			if (draw || out) begin
+			if (draw) begin
 				drawOnVGA <= 1'b1;
 			end
-
 			else
 				drawOnVGA <= 1'b0;
+
 			if (out) begin
 				xCoordinate <= X + Counter[1:0];
-				yCoordinate <= Y + Counter [3:2];
+				yCoordinate <= Y + Counter[3:2];
 			end
 		end
 	end

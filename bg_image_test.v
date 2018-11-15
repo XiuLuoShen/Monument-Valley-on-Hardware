@@ -8,14 +8,48 @@ module vga_test(
 	);
 
 	wire resetn = KEY[0];
-	wire ld_dir = ~KEY[1];			// refactor this so ld_dir and move are done in 1 button
-	wire move = ~KEY[2];
+	wire move = ~KEY[1];
 	wire resetnMonitor = KEY[3];
-	wire clear = SW[3];					// TODO: Make clear reset the game back to the start
-	wire plot;									// Connection to vga adapter telling to draw pixel X, Y with color
-	wire [8:0] X;
-	wire [7:0] Y;
-	wire [2:0] color;
+	wire clear = SW[3];
+
+
+	reg plot;									// Connection to vga adapter telling to draw pixel X, Y with color
+	wire drawOnVGA_Sprite;
+	wire drawOnVGA_clear;			// Maybe connect this to map later
+	always @(*) begin
+		if (clear)
+			plot = drawOnVGA_clear;
+		else
+			plot = drawOnVGA_Sprite;
+	end
+
+	reg [8:0] X;
+	reg [7:0] Y;
+	wire [8:0] X_clear;
+	wire [7:0] Y_clear;
+	wire [8:0] X_sprite;
+	wire [7:0] Y_sprite;
+
+	always @(*) begin
+		if (clear) begin
+			X = X_clear;
+			Y = Y_clear;
+		end
+		else begin
+			X = X_sprite;
+			Y = Y_sprite;
+		end
+	end
+
+	reg color;
+	wire [2:0] color_sprite;
+	wire [2:0] color_clear;
+	always @(*) begin
+		if (clear)
+			color = color_clear;
+		else
+			color = color_sprite;
+	end
 
 	// direction that the sprite moves in, second bit is left right (0/1) and first bit is down up (0/1)
 	wire [1:0] dir = SW[1:0];
@@ -25,15 +59,21 @@ module vga_test(
 		.clock(CLOCK_50),
 		.resetn(resetn),
 		.move(move),
-		.ld_dir(ld_dir),
 		.dir(dir),
-		.clear(clear),
 		.plot(plot),
 		.color(color),
-		.xCoord(X),
-		.yCoord(Y)
+		.xCoord(X_sprite),
+		.yCoord(Y_sprite)
 		);
 
+	clearScreenFSM clearScreen(
+		  .clock(CLOCK_50),
+			.clear(clear),     // not sure if resetn is needed
+		  .drawOnVGA(drawOnVGA),
+			.color(color_clear),
+			.X(X_clear),
+			.Y(Y_clear)
+		);
 
 	vga_adapter display(
 		.resetn(resetnMonitor),

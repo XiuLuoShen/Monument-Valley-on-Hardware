@@ -8,11 +8,14 @@ module getBackgroundPixel(
 	output [2:0] color
 	);
 
-	wire [16:0] memoryAddress;
+	reg [17:0] memoryAddress;
 	
 	// converts the X and Y coordinates into a memory address
-	vga_address_translator address_translator(.x(X), .y(Y), .mem_address(memoryAddress));
-//	BG_original bg(.address(memoryAddress), .clock(clock), .q(color));
-	MapImage bg(.address(memoryAddress), .clock(clock), .data(3'b111), .wren(1'b0), .q(color));
+	always @(*) begin
+		memoryAddress = Y*9'd320 + X;
+	end
+	
+	BG_original bg(.address(memoryAddress), .clock(clock), .q(color));
+//	MapImage bg(.address(memoryAddress), .clock(clock), .data(3'b111), .wren(1'b0), .q(color));
 
 endmodule

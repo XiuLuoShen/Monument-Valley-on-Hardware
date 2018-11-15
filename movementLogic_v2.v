@@ -1,7 +1,7 @@
 // These modules are for the FSM that work with movement
 // Modified movementLogic that should work with only 1 button now
 
-moveSprite(
+module moveSprite(
   input move, resetn, clock, doneChar, doneBG,
   input [1:0] dir,
   output [8:0] xCoordinate, // For 320x240 res...
@@ -93,8 +93,10 @@ module moveSpriteControl(
       WAIT1: begin wait1 = 1'b1; checkMove = 1'b1; end
       CHECK_MOVE: checkMove = 1'b1;
       REDRAW_BG:  drawBG = 1'b1;
+	    WAIT_BG:		drawBG = 1'b1;
       UPDATE_LOC: update_pos = 1'b1;
       DRAW_CHAR:  drawChar = 1'b1;
+	    WAIT_CHAR:	drawChar = 1'b1;
     endcase
   end
 
@@ -115,6 +117,7 @@ module moveSpriteDataPath(
 );
   reg [8:0] newX;
   reg [7:0] newY;
+  reg teleport;
 
   always @(posedge clock) begin
     case (dir)
@@ -139,9 +142,10 @@ module moveSpriteDataPath(
 
   always @(posedge clock) begin
     if (!resetn) begin
-      X <= 9'd1;  // initial sprite location
-      Y <= 8'd16;
+      X <= 8'd95;  // initial sprite location
+      Y <= 9'd221;
       validMove <= 1'b0;
+		teleport <= 1'b0;
     end
 
     else  begin
@@ -149,52 +153,73 @@ module moveSpriteDataPath(
         if (newX <= 1'b0 || newY <= 1'b0)
           validMove = 1'b0; // ensures the square does not go off screen
 
-      	// starting point to first door
-        else if (newY == 9'd222 - newX) // diagonal BL to TR
-          if (newX <= 8'd122 && newX >= 8'd96)
+		  else if (newX == 8'd120 && newY == 8'd196) begin
+				teleport = 1'b1;
+				validMove = 1'b1;
+			end
+
+        // starting point to first door
+        else if (newY == 9'd316 - newX) begin // diagonal BL to TR
+          if (newX <= 8'd120 && newX >= 8'd95)
             validMove = 1'b1;
+			end
 
         // door to first corner
-        else if (newY == 8'd96 + newX) // diagonal TL to BR
-          if (newX >= 8'd127 && newX <= 8'd181)
+        else if (newY == newX - 8'd58) begin // diagonal TL to BR
+          if (newX >= 8'd126 && newX <= 8'd170)
             validMove = 1'b1;
+			end
 
         // first corner to first button
-        else if (newY == 9'd113 - newX)
-          if (newX >= 8'd125 && newX <= 8'd181)
+        else if (newY == 8'd282 - newX)	begin
+          if (newX >= 8'd124 && newX <= 8'd170)
             validMove = 1'b1;
+			end
 
         // first button to moving platform
-        else if (newY == 9'd159 - newX)
-          if (newX >= 8'd125 && newX <= 8'd161)
+        else if (newY == 9'd282 - newX)	begin
+          if (newX >= 8'd124 && newX <= 8'd160)
             validMove = 1'b1;
+			end
 
         // moving platform to island
-        else if (newY == 9'd123 + newX)
-          if (newX >= 8'd161 && newX <= 8'd216)
+        else if (newY == newX - 8'd38)	begin
+          if (newX >= 8'd160 & newX <= 8'd216)
             validMove = 1'b1;
+			end
 
         // island
-        else if (newY == 9'd178 - newX)
-          if (newX >= 8'd180 && newX <= 8'd216)
+        else if (newY == 9'd392 - newX) begin
+          if (newX >= 8'd179 && newX <= 8'd215)
             validMove = 1'b1;
+			end
 
         // island to first button again
-        else if (newY == 9'd214 + newX)
-          if (newX >= 8'd125 && newX <= 8'd180)
+        else if (newY == newX - 8'd89)	begin
+          if (newX >= 8'd124 && newX <= 8'd179)
             validMove = 1'b1;
+			end
 
         // top of platform to end
-        else if (newY == 9'd187 - newX)
-          if (newX >= 8'd159 && newX <= 8'd127)
+        else if (newY == 8'd210 - newX)	begin
+          if (newX >= 8'd158 && newX <= 8'd124)
             validMove = 1'b1;
+			end
 
         else validMove = 1'b0;
       end
 
       if (update_pos) begin
+		if (teleport) begin
+			X <= 9'd126;
+			Y <= 8'd68;
+		end
+		else begin
         X <= newX;
         Y <= newY;
+	  end
+		  validMove <= 1'b0;
+		  teleport <= 1'b0;
         end
     end
 
