@@ -10,7 +10,7 @@ module vga_test(
 	wire resetn = KEY[0];
 	wire move = ~KEY[1];
 	wire resetnMonitor = KEY[3];
-	wire clear = SW[3];
+	wire clear = ~KEY[2];
 
 
 	reg plot;									// Connection to vga adapter telling to draw pixel X, Y with color
@@ -19,8 +19,10 @@ module vga_test(
 	always @(*) begin
 		if (clear)
 			plot = drawOnVGA_clear;
-		else
+		else if (move)
 			plot = drawOnVGA_Sprite;
+		else
+			plot = 1'b0;
 	end
 
 	reg [8:0] X;
@@ -41,14 +43,14 @@ module vga_test(
 		end
 	end
 
-	reg color;
+	reg [2:0] color;
 	wire [2:0] color_sprite;
 	wire [2:0] color_clear;
 	always @(*) begin
-		if (clear)
-			color = color_clear;
-		else
+		if (move)
 			color = color_sprite;
+		else
+			color = color_clear;
 	end
 
 	// direction that the sprite moves in, second bit is left right (0/1) and first bit is down up (0/1)
@@ -60,8 +62,8 @@ module vga_test(
 		.resetn(resetn),
 		.move(move),
 		.dir(dir),
-		.plot(plot),
-		.color(color),
+		.plot(drawOnVGA_Sprite),
+		.color(color_sprite),
 		.xCoord(X_sprite),
 		.yCoord(Y_sprite)
 		);
@@ -69,7 +71,7 @@ module vga_test(
 	clearScreenFSM clearScreen(
 		  .clock(CLOCK_50),
 			.clear(clear),     // not sure if resetn is needed
-		  .drawOnVGA(drawOnVGA),
+		  .drawOnVGA(drawOnVGA_clear),
 			.color(color_clear),
 			.X(X_clear),
 			.Y(Y_clear)

@@ -142,8 +142,8 @@ module moveSpriteDataPath(
 
   always @(posedge clock) begin
     if (!resetn) begin
-      X <= 8'd95;  // initial sprite location
-      Y <= 9'd221;
+      X <= 9'd95;  // initial sprite location
+      Y <= 8'd221;
       validMove <= 1'b0;
 		teleport <= 1'b0;
     end

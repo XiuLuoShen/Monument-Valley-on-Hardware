@@ -5,12 +5,12 @@ module clearScreenFSM(
   output drawOnVGA,
   output [2:0] color,
   output [8:0] X,
-  output [7:0] Y,
+  output [7:0] Y
 );
 
   wire done, draw, nextPixel;
-  assign X = xPixel;
-  assign Y = yPixel;
+//  assign X = xPixel;
+//  assign Y = yPixel;
 
   clearScreenControl  csControl(
     .clock(clock),
@@ -30,13 +30,13 @@ module clearScreenFSM(
     .X(X),
     .Y(Y),
     .color(color)
-  )
+  );
 
 endmodule
 
 module clearScreenControl(
   input clock, go, done,
-  output reg nextPixel, draw,
+  output reg nextPixel, draw
 );
 
   reg [2:0] current_state, next_state;
@@ -50,7 +50,7 @@ module clearScreenControl(
 
   always @(*) begin // state_table
     case(current_state)
-      INACTIVE: go? WAIT_COLOR: INACTIVE;           // Waiting for clear command
+      INACTIVE: next_state = go? WAIT_COLOR: INACTIVE;           // Waiting for clear command
       WAIT_COLOR: next_state = DRAW;                // Wait state so we can get the color from ROM
       DRAW: next_state = NEXT_PIXEL;                // Draw the pixel
       NEXT_PIXEL: next_state = done? DONE: WAIT_COLOR;  // Get the next pixel or go to done
@@ -79,21 +79,21 @@ module clearScreenControl(
       else
         current_state <= next_state;
     end
-endmodule;
+endmodule
 
 
 module clearScreenDataPath(
-  input clock, draw, nextPixel, go
+  input clock, draw, nextPixel, go,
   output reg drawOnVGA, done,
   output reg [8:0] X,
   output reg [7:0] Y,
-  output reg [2:0] color,
-)
+  output [2:0] color
+);
   reg [8:0] xPixel;
   reg [7:0] yPixel;
 
   // assuming its possible to have multiple accessers to ROM
-  getBackgroundPixel bg(.clock(clk), .X(xPixel), .Y(yPixel), .color(color));
+  getBackgroundPixel bg(.clock(clock), .X(xPixel), .Y(yPixel), .color(color));
 
   always @(posedge clock) begin
     if (!go) begin
@@ -104,12 +104,13 @@ module clearScreenDataPath(
     end
 
     else begin
-      if (draw)
+      if (draw) begin
         X <= xPixel;
         Y <= yPixel;
         drawOnVGA <= 1'b1;
+	   end
       else
-        drawOnVGA = 1'b0;
+        drawOnVGA <= 1'b0;
 
       // get the next pixel
       if (nextPixel) begin
@@ -125,4 +126,5 @@ module clearScreenDataPath(
       end
     end
   end
-endmodule;
+  
+endmodule

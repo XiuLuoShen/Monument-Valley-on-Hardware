@@ -63,7 +63,7 @@ module spriteDrawer(
 	control1 C1(
 		.clk(clock),
 		.resetn(resetn),
-		.drawChar(drawChar)
+		.drawChar(drawChar),
 		.drawBG(drawBG),
 		.Counter(Counter),
 		.load_data(load_data),
@@ -112,8 +112,8 @@ module control1(
 	always @(*)
 	begin: state_table
 		case (current_state)
-			WAIT:	next_state = go? PREPARE_TO_DRAW: WAIT;
-			PREPARE_TO_DRAW_CHAR:		next_state = GET_COLOR; // load x and y into the coordinate registers
+			WAIT:	next_state = (drawChar || drawBG)? PREPARE_TO_DRAW: WAIT;
+			PREPARE_TO_DRAW:		next_state = GET_COLOR; // load x and y into the coordinate registers
 			GET_COLOR: next_state = DRAW;
 			DRAW:		next_state = INCREASE_COUNT;						// set plot to 1
 			INCREASE_COUNT:	next_state = (Counter == 4'd15)? DONE : PREPARE_TO_DRAW;

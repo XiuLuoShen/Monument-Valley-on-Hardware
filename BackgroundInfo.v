@@ -8,7 +8,7 @@ module getBackgroundPixel(
 	output [2:0] color
 	);
 
-	reg [17:0] memoryAddress;
+	reg [16:0] memoryAddress;
 	
 	// converts the X and Y coordinates into a memory address
 	always @(*) begin
