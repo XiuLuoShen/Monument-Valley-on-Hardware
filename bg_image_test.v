@@ -11,71 +11,26 @@ module vga_test(
 	wire move = ~KEY[1];
 	wire resetnMonitor = KEY[3];
 	wire clear = ~KEY[2];
-
-
-	reg plot;									// Connection to vga adapter telling to draw pixel X, Y with color
-	wire drawOnVGA_Sprite;
-	wire drawOnVGA_clear;			// Maybe connect this to map later
-	always @(*) begin
-		if (clear)
-			plot = drawOnVGA_clear;
-		else if (move)
-			plot = drawOnVGA_Sprite;
-		else
-			plot = 1'b0;
-	end
-
-	reg [8:0] X;
-	reg [7:0] Y;
-	wire [8:0] X_clear;
-	wire [7:0] Y_clear;
-	wire [8:0] X_sprite;
-	wire [7:0] Y_sprite;
-
-	always @(*) begin
-		if (clear) begin
-			X = X_clear;
-			Y = Y_clear;
-		end
-		else begin
-			X = X_sprite;
-			Y = Y_sprite;
-		end
-	end
-
-	reg [2:0] color;
-	wire [2:0] color_sprite;
-	wire [2:0] color_clear;
-	always @(*) begin
-		if (move)
-			color = color_sprite;
-		else
-			color = color_clear;
-	end
-
-	// direction that the sprite moves in, second bit is left right (0/1) and first bit is down up (0/1)
 	wire [1:0] dir = SW[1:0];
-	assign LEDR[3] = clear;			// LED to indicate when the board is being cleared
+	assign LEDR[3] = clear;			// LED to indicate when the board is being cleared/reset
 
-	spriteFSM sprite(
+	wire plot;
+	wire [2:0] color;
+	wire [8:0] X;
+	wire [7:0] Y;
+
+	MonumentValley Game(
 		.clock(CLOCK_50),
 		.resetn(resetn),
 		.move(move),
+		.clear(clear),
 		.dir(dir),
-		.plot(drawOnVGA_Sprite),
-		.color(color_sprite),
-		.xCoord(X_sprite),
-		.yCoord(Y_sprite)
-		);
+		.plot(plot),
+		.color(color),
+		.X(X),
+		.Y(Y),
+	);
 
-	clearScreenFSM clearScreen(
-		  .clock(CLOCK_50),
-			.clear(clear),     // not sure if resetn is needed
-		  .drawOnVGA(drawOnVGA_clear),
-			.color(color_clear),
-			.X(X_clear),
-			.Y(Y_clear)
-		);
 
 	vga_adapter display(
 		.resetn(resetnMonitor),

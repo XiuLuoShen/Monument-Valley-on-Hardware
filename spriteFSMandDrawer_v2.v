@@ -3,7 +3,7 @@
 // then draws a new red square (the sprite) at the new location
 
 module spriteFSM(
-	input clock, resetn, move, clear,
+	input clock, resetn, move,
 	input [1:0] dir,
 	output plot,
 	output [2:0] color,
@@ -44,12 +44,10 @@ module spriteFSM(
 
 endmodule
 
-
-
 module spriteDrawer(
 	input [8:0] data_x,
 	input [7:0] data_y,
-	input resetn, clear, drawChar, drawBG, clock,
+	input resetn, drawChar, drawBG, clock,
 	output [8:0] xCoordinate,
 	output [7:0] yCoordinate,
 	output [2:0] colorToDraw,
