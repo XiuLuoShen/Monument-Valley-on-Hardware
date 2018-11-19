@@ -2,16 +2,18 @@
 // After it has drawn the map, it will draw the character at the appropropriate location
 
 module DrawMapFSM(
-  input clock, drawMap,
-  input [3:0] gameState.
-  output drawOnVGA,
+  input clock, drawMap, resetn,
+  input [3:0] gameState,
+  output reg drawOnVGA,
   output reg [2:0] color,
   output reg [8:0] X,
-  output reg [7:0] Y
-  output doneRedraw,  // Send to gameState to tell it that the update has been completed
+  output reg [7:0] Y,
+  output doneRedraw  // Send to gameState to tell it that the update has been completed
 );
 
   wire done, draw, nextPixel, doneChar, drawChar;
+  wire drawOnVGA_char, drawOnVGA_Map;
+  
 
   wire [2:0] color_char, color_BG;
   wire [8:0] X_char, X_BG;
@@ -19,15 +21,15 @@ module DrawMapFSM(
 
   always @(*) begin
     if (drawChar) begin
-      X = X_Char;
-      Y = Y_Char;
+      X = X_char;
+      Y = Y_char;
       drawOnVGA = drawOnVGA_char;
       color = color_char;
     end
     else begin
       X = X_BG;
       Y = Y_BG;
-      drawOnVGA = drawOnVGA_BG;
+      drawOnVGA = drawOnVGA_Map;
       color = color_BG;
     end
   end
@@ -40,16 +42,16 @@ module DrawMapFSM(
     .nextPixel(nextPixel),
     .draw(draw),
     .drawChar(drawChar),
-    .doneRedraw(doneRedraw),
+    .doneRedraw(doneRedraw)
   );
 
   DrawMapDataPath dmDP(
     .clock(clock),
-    .go(clear),
+    .go(resetn),
     .draw(draw),
     .nextPixel(nextPixel),
     .gameState(gameState),
-    .drawOnVGA(drawOnVGA_BG),
+    .drawOnVGA(drawOnVGA_Map),
     .done(done),
     .X(X_BG),
     .Y(Y_BG),
@@ -75,17 +77,19 @@ module DrawMapFSM(
 
   always @(*) begin
     case(gameState)
-      DRAW_INITIAL:
-      INITIAL:
-      UPDATE_BRIDGE_1:
-      FORMED_BRIDGE_1:
-      UPDATE_BRIDGE_2:
-      FORMED_BRIDGE_2:
-      UPDATE_BRIDGE_3:
-      FORMED_BRIDGE_3:
-      UPDATE_PILLAR:
-      PILLAR_RISED:
-      FINISHED_GAME:
+		DRAW_INITIAL || INITIAL: begin
+			x_initial_pos = 9'd95;
+			y_initial_pos = 8'd221;
+		end
+//      UPDATE_BRIDGE_1:
+//      FORMED_BRIDGE_1:
+//      UPDATE_BRIDGE_2:
+//      FORMED_BRIDGE_2:
+//      UPDATE_BRIDGE_3:
+//      FORMED_BRIDGE_3:
+//      UPDATE_PILLAR:
+//      PILLAR_RISED:
+//      FINISHED_GAME:
       default:  begin
         x_initial_pos = 9'd95;
         y_initial_pos = 8'd221;
@@ -105,7 +109,7 @@ module DrawMapFSM(
 		.yCoordinate(Y_char),
 		.drawOnVGA(drawOnVGA_char),
 		.colorToDraw(color_char),
-		.doneDraw(doneChar),
+		.doneDraw(doneChar)
 		);
 
 endmodule
@@ -149,6 +153,7 @@ module DrawMapControl(
       DRAW: draw = 1'b1;
       NEXT_PIXEL: nextPixel = 1'b1;
       DRAW_CHAR: drawChar = 1'b1;
+		WAIT_CHAR: drawChar = 1'b1;
       DONE: doneRedraw = 1'b1;
       default: begin
         draw = 1'b0;

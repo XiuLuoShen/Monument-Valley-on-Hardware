@@ -18,26 +18,40 @@ module getBackgroundPixel(
 
 	// ROM Modules and their corresponding wires here:
 	wire [2:0] original;
-	BG_original bg(.address(memoryAddress), .clock(clock), .q(original));
+	BG_original bg1(.address(memoryAddress), .clock(clock), .q(original));
+	
+	wire [2:0] bridge2;
+	Bridge2Formed bg2(.address(memoryAddress), .clock(clock), .q(bridge2));
+	
+	wire [2:0] pillarRisen;
+	PillarRisen bg3(.address(memoryAddress), .clock(clock), .q(pillarRisen));
 
 	localparam
-		DRAW_INITIAL = 4'10,
-		INITIAL = 4'b0,
-		UPDATE_BRIDGE_1 = 4'b1,
-		FORMED_BRIDGE_1 = 4'b2,
-		UPDATE_BRIDGE_2 = 4'b3,
-		FORMED_BRIDGE_2 = 4'b4,
-		UPDATE_BRIDGE_3 = 4'b5,
-		FORMED_BRIDGE_3 = 4'b6,
-		UPDATE_PILLAR = 4'b7,
-		PILLAR_RISED = 4'b8,
-		FINISHED_GAME = 4'b9;
+		DRAW_INITIAL = 4'd10,
+		INITIAL = 4'd0,
+		UPDATE_BRIDGE_1 = 4'd1,
+		FORMED_BRIDGE_1 = 4'd2,
+		UPDATE_BRIDGE_2 = 4'd3,
+		FORMED_BRIDGE_2 = 4'd4,
+		UPDATE_BRIDGE_3 = 4'd5,
+		FORMED_BRIDGE_3 = 4'd6,
+		UPDATE_PILLAR = 4'd7,
+		PILLAR_RISED = 4'd8,
+		FINISHED_GAME = 4'd9;
 
 	always @(*) begin
 		if (gameState == DRAW_INITIAL || gameState == INITIAL)
 			color = original;
 		else if (gameState == UPDATE_BRIDGE_1 || gameState == FORMED_BRIDGE_1)
-			color = ........;
-		else if .....
+			color = bridge2;
+		else if (gameState == UPDATE_BRIDGE_2 || gameState == FORMED_BRIDGE_2)
+			color = bridge2;
+		else if (gameState == UPDATE_BRIDGE_3 || gameState == FORMED_BRIDGE_3)
+			color = pillarRisen;
+		else if (gameState == UPDATE_PILLAR || gameState == PILLAR_RISED)
+			color = pillarRisen;
+		else
+			color = original;
+	end
 
 endmodule

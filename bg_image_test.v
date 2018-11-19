@@ -10,9 +10,9 @@ module vga_test(
 	wire resetn = KEY[0];
 	wire move = ~KEY[1];
 	wire resetnMonitor = KEY[3];
-	wire clear = ~KEY[2];
+	wire drawMap = ~KEY[2];
 	wire [1:0] dir = SW[1:0];
-	assign LEDR[3] = clear;			// LED to indicate when the board is being cleared/reset
+	assign LEDR[3] = drawMap;			// LED to indicate when the board is being cleared/reset
 
 	wire plot;
 	wire [2:0] color;
@@ -23,12 +23,12 @@ module vga_test(
 		.clock(CLOCK_50),
 		.resetn(resetn),
 		.move(move),
-		.clear(clear),
+		.drawMap(drawMap),
 		.dir(dir),
 		.plot(plot),
 		.color(color),
 		.X(X),
-		.Y(Y),
+		.Y(Y)
 	);
 
 
