@@ -6,5 +6,4 @@ incremental_db/
 output_files/
 bmp2mif*
 moverFSM_Lab7.v
-greybox_tmp/
 *.txt
