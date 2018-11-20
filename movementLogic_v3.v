@@ -160,52 +160,62 @@ module moveSpriteDataPath(
 			end
 
         // starting point to first door
-        else if (newY == 9'd316 - newX) begin // diagonal BL to TR
-          if (newX <= 8'd120 && newX >= 8'd95)
+        else if (newY <= 8'd314 - newX && newY >= 8'd325 - newX) begin // diagonal BL to TR
+          if ((newX >= 8'd123 && newX <= 8'd224) || (newX >= 8'd95 && newX <= 8'd123))
             validMove = 1'b1;
 			end
 
         // door to first corner
-        else if (newY == newX - 8'd58) begin // diagonal TL to BR
-          if (newX >= 8'd126 && newX <= 8'd170)
+        else if (newY <= newX - 8'd49 && newY >= newX - 8'd66) begin // diagonal TL to BR
+          if ((newX >= 8'd126 && newX <= 8'd172) || (newX >= 8'd127 && newX <= 8'd180))
             validMove = 1'b1;
 			end
 
         // first corner to first button
-        else if (newY == 8'd282 - newX)	begin
-          if (newX >= 8'd124 && newX <= 8'd170)
+        else if (newY <= 8'd295 - newX && newY >= 8'd277 - newX)	begin // [bottom diagonal] && [top diagonal]
+          if ((newX >= 8'd125 && newX <= 8'd180) || (newX >= 8'd171 && newX <= 8'd116))
             validMove = 1'b1;
 			end
 
         // first button to moving platform
-        else if (newY == 9'd282 - newX)	begin
-          if (newX >= 8'd124 && newX <= 8'd160)
-            validMove = 1'b1;
-			end
+
+        // skip this for now
+
+   //      else if (newY == 9'd282 - newX)	begin // [bottom diagonal] && [top diagonal]
+   //        if ((newX >= 8'd && newX <= 8'd) || (newX >= 8'd && newX <= 8'd))
+   //          validMove = 1'b1;
+			// end
 
         // moving platform to island
-        else if (newY == newX - 8'd38)	begin
-          if (newX >= 8'd160 & newX <= 8'd215)
+        else if (newY == newX - 8'd27 && newY == newX - 8'd47)	begin
+          if ((newX >= 8'd152 && newX <= 8'd217) || (newX >= 8'd162 && newX <= 8'd227))
             validMove = 1'b1;
 			end
 
         // island
-        else if (newY == 9'd392 - newX) begin
-          if (newX >= 8'd179 && newX <= 8'd215)
+        else if (newY == 9'd387 - newX && newY == 9'd407 - newX) begin
+          if ((newX >= 8'd171 && newX <= 8'd217) || (newX >= 8'd181 && newX <= 8'd227))
             validMove = 1'b1;
 			end
 
         // island to first button again
-        else if (newY == newX - 8'd89)	begin
-          if (newX >= 8'd124 && newX <= 8'd179)
+        else if (newY == newX + 8'd45 && newY == newX + 8'd27)	begin
+          if ((newX >= 8'd116 && newX <= 8'd181) || (newX >= 8'd125 && newX <= 8'd190))
             validMove = 1'b1;
 			end
 
-        // top of platform to end
-        else if (newY == 8'd210 - newX)	begin
-          if (newX <= 8'd158 && newX >= 8'd124)
+        // top of platform to original path
+        else if (newY == 8'd223 - newX && newY == 8'd203 - newX)	begin
+          if ((newX >= 8'd126 && newX <= 8'd144) || (newX >= 8'd116 && newX <= 8'd134))
             validMove = 1'b1;
 			end
+
+      // original path to end
+        
+        else if (newY == 8'd218 - newX && newY == 8'd208 - newX) begin
+          if ((newX >= 8'd134 && newX <= 8'd166) || (newX >= 8'd129 && newX <= 8'd161))
+            validMove = 1'b1;
+      end
 
         else validMove = 1'b0;
       end
