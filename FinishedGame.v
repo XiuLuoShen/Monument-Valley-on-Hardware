@@ -4,7 +4,7 @@
 // MODULE: altsyncram 
 
 // ============================================================
-// File Name: PillarRisen.v
+// File Name: FinishedGame.v
 // Megafunction Name(s):
 // 			altsyncram
 //
@@ -36,7 +36,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module PillarRisen (
+module FinishedGame (
 	address,
 	clock,
 	q);
@@ -83,7 +83,7 @@ module PillarRisen (
 		altsyncram_component.address_aclr_a = "NONE",
 		altsyncram_component.clock_enable_input_a = "BYPASS",
 		altsyncram_component.clock_enable_output_a = "BYPASS",
-		altsyncram_component.init_file = "../pillar-rised.mif",
+		altsyncram_component.init_file = "../FB_Emoji.colour.mif",
 		altsyncram_component.intended_device_family = "Cyclone V",
 		altsyncram_component.lpm_hint = "ENABLE_RUNTIME_MOD=NO",
 		altsyncram_component.lpm_type = "altsyncram",
@@ -118,7 +118,7 @@ endmodule
 // Retrieval info: PRIVATE: JTAG_ENABLED NUMERIC "0"
 // Retrieval info: PRIVATE: JTAG_ID STRING "NONE"
 // Retrieval info: PRIVATE: MAXIMUM_DEPTH NUMERIC "0"
-// Retrieval info: PRIVATE: MIFfilename STRING "../pillar-rised.mif"
+// Retrieval info: PRIVATE: MIFfilename STRING "../FB_Emoji.colour.mif"
 // Retrieval info: PRIVATE: NUMWORDS_A NUMERIC "76800"
 // Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "0"
 // Retrieval info: PRIVATE: RegAddr NUMERIC "1"
@@ -133,7 +133,7 @@ endmodule
 // Retrieval info: CONSTANT: ADDRESS_ACLR_A STRING "NONE"
 // Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_A STRING "BYPASS"
 // Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_A STRING "BYPASS"
-// Retrieval info: CONSTANT: INIT_FILE STRING "../pillar-rised.mif"
+// Retrieval info: CONSTANT: INIT_FILE STRING "../FB_Emoji.colour.mif"
 // Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone V"
 // Retrieval info: CONSTANT: LPM_HINT STRING "ENABLE_RUNTIME_MOD=NO"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "altsyncram"
@@ -150,10 +150,10 @@ endmodule
 // Retrieval info: CONNECT: @address_a 0 0 17 0 address 0 0 17 0
 // Retrieval info: CONNECT: @clock0 0 0 0 0 clock 0 0 0 0
 // Retrieval info: CONNECT: q 0 0 3 0 @q_a 0 0 3 0
-// Retrieval info: GEN_FILE: TYPE_NORMAL PillarRisen.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL PillarRisen.inc FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL PillarRisen.cmp FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL PillarRisen.bsf FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL PillarRisen_inst.v FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL PillarRisen_bb.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FinishedGame.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FinishedGame.inc FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FinishedGame.cmp FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FinishedGame.bsf FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FinishedGame_inst.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL FinishedGame_bb.v FALSE
 // Retrieval info: LIB_FILE: altera_mf
