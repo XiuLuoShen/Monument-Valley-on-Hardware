@@ -185,7 +185,7 @@ module moveSpriteDataPath(
 
         // moving platform to island
         else if (newY == newX - 8'd38)	begin
-          if (newX >= 8'd160 & newX <= 8'd216)
+          if (newX >= 8'd160 & newX <= 8'd215)
             validMove = 1'b1;
 			end
 
