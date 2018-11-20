@@ -5,11 +5,19 @@ module DrawMapFSM(
   input clock, drawMap,
   input [3:0] gameState,
 <<<<<<< HEAD
+<<<<<<< HEAD
   output drawOnVGA,
   output reg [2:0] color,
   output reg [8:0] X,
   output reg [7:0] Y,
   output doneRedraw,  // Send to gameState to tell it that the update has been completed
+=======
+  output reg drawOnVGA,
+  output reg [2:0] color,
+  output reg [8:0] X,
+  output reg [7:0] Y,
+  output doneRedraw  // Send to gameState to tell it that the update has been completed
+>>>>>>> aeea77dc1ebf75a5d5b062b5157120fe07828f92
 =======
   output reg drawOnVGA,
   output reg [2:0] color,
@@ -87,6 +95,7 @@ module DrawMapFSM(
   always @(*) begin
     case(gameState)
 <<<<<<< HEAD
+<<<<<<< HEAD
       DRAW_INITIAL: // when the drawing occurs
       INITIAL: // idle state
       UPDATE_BRIDGE_1: x_initial_pos = 9'd160 && y_initial_pos = 8'd122; // Start of moving platform
@@ -100,6 +109,8 @@ module DrawMapFSM(
       FINISHED_GAME: x_initial_pos = 9'd158 && y_initial_pos = 8'd52; // End
       default:  begin
 =======
+=======
+>>>>>>> aeea77dc1ebf75a5d5b062b5157120fe07828f92
 		DRAW_INITIAL, INITIAL: begin
 			x_initial_pos = 9'd95;
 			y_initial_pos = 8'd221;
@@ -121,6 +132,9 @@ module DrawMapFSM(
       y_initial_pos = 8'd86;
     end
     default:  begin
+<<<<<<< HEAD
+>>>>>>> aeea77dc1ebf75a5d5b062b5157120fe07828f92
+=======
 >>>>>>> aeea77dc1ebf75a5d5b062b5157120fe07828f92
         x_initial_pos = 9'd95;
         y_initial_pos = 8'd221;

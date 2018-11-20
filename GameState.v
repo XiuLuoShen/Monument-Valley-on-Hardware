@@ -16,7 +16,11 @@ module GameState(
   // Might require wait states between update and formed states
   localparam
 <<<<<<< HEAD
+<<<<<<< HEAD
     DRAW_INITIAL = 4'd10,
+=======
+    DRAW_INITIAL = 4'd0,
+>>>>>>> aeea77dc1ebf75a5d5b062b5157120fe07828f92
 =======
     DRAW_INITIAL = 4'd0,
 >>>>>>> aeea77dc1ebf75a5d5b062b5157120fe07828f92

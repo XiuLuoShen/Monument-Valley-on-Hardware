@@ -4,6 +4,7 @@
 module moveSprite(
   input move, resetn, clock, doneChar, doneBG,
   input [1:0] dir,
+  input [3:0] gameState,
   output [8:0] xCoordinate, // For 320x240 res...
   output [7:0] yCoordinate,
   output drawChar, drawBG         // THESE ARE SIGNALS SENT TO THE SPRITE DRAWER FSM TELLING IT TO DRAW THE BG OR CHAR
@@ -202,7 +203,7 @@ module moveSpriteDataPath(
 
         // top of platform to end
         else if (newY == 8'd210 - newX)	begin
-          if (newX >= 8'd158 && newX <= 8'd124)
+          if (newX <= 8'd158 && newX >= 8'd124)
             validMove = 1'b1;
 			end
 

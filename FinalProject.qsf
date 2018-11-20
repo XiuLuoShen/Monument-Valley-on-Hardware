@@ -691,22 +691,21 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_USB_NXT -entity 
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_USB_STP -entity DE1_SoC
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name VERILOG_FILE movementLogic.v
-set_global_assignment -name MIF_FILE vga_adapter/white.mif
-set_global_assignment -name MIF_FILE vga_adapter/map.mif
-set_global_assignment -name MIF_FILE white.mif
-set_global_assignment -name MIF_FILE map.mif
-set_global_assignment -name MIF_FILE image.mono.mif
-set_global_assignment -name MIF_FILE FB_Emoji.colour.mif
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name VERILOG_FILE DrawMap.v
+set_global_assignment -name VERILOG_FILE BackgroundInfo.v
+set_global_assignment -name VERILOG_FILE MonumentValley.v
+set_global_assignment -name VERILOG_FILE spriteFSMandDrawer_v2.v
+set_global_assignment -name VERILOG_FILE movementLogic_v2.v
 set_global_assignment -name VERILOG_FILE vga_adapter/vga_pll.v
 set_global_assignment -name VERILOG_FILE vga_adapter/vga_controller.v
 set_global_assignment -name VERILOG_FILE vga_adapter/vga_address_translator.v
 set_global_assignment -name VERILOG_FILE vga_adapter/vga_adapter.v
 set_global_assignment -name VERILOG_FILE RateDividerModule.v
 set_global_assignment -name VERILOG_FILE bg_image_test.v
-set_global_assignment -name QIP_FILE BG.qip
-set_global_assignment -name VERILOG_FILE spriteFSMandDrawer.v
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name QIP_FILE Bridge2Formed.qip
+set_global_assignment -name QIP_FILE BG_original.qip
+set_global_assignment -name QIP_FILE PillarRisen.qip
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
