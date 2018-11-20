@@ -25,6 +25,9 @@ module getBackgroundPixel(
 
 	wire [2:0] pillarRisen;
 	PillarRisen bg3(.address(memoryAddress), .clock(clock), .q(pillarRisen));
+	
+	wire [2:0] finishGame;
+	FinishedGame bg4(.address(memoryAddress), .clock(clock), .q(finishGame));
 	// ***************
 
 	localparam
@@ -43,18 +46,29 @@ module getBackgroundPixel(
 
 	// The memory block that is used to determine the color changes depending on the gameState
 	always @(*) begin
-		if (gameState == DRAW_INITIAL || gameState == INITIAL)
-			color = original;
-		else if (gameState == UPDATE_BRIDGE_1 || gameState == FORMED_BRIDGE_1)
-			color = bridge2;
-		else if (gameState == UPDATE_BRIDGE_2 || gameState == FORMED_BRIDGE_2)
-			color = pillarRisen;
-		else if (gameState == UPDATE_BRIDGE_3 || gameState == FORMED_BRIDGE_3)
-			color = bridge2;
-		else if (gameState == UPDATE_PILLAR || gameState == PILLAR_RISED)
-			color = pillarRisen;
-		else
-			color = original;
+	case(gameState)
+		DRAW_INITIAL, INITIAL: color = original;
+		UPDATE_BRIDGE_1, FORMED_BRIDGE_1:	color = bridge2;
+		UPDATE_BRIDGE_2, FORMED_BRIDGE_2:	color = pillarRisen;
+		UPDATE_BRIDGE_3, FORMED_BRIDGE_3:	color = bridge2;
+		UPDATE_PILLAR, PILLAR_RISED:	color = pillarRisen;
+		FINISHED_GAME:	color = finishGame;
+	endcase
+	
+//		if (gameState == DRAW_INITIAL || gameState == INITIAL)
+//			color = original;
+//		else if (gameState == UPDATE_BRIDGE_1 || gameState == FORMED_BRIDGE_1)
+//			color = bridge2;
+//		else if (gameState == UPDATE_BRIDGE_2 || gameState == FORMED_BRIDGE_2)
+//			color = pillarRisen;
+//		else if (gameState == UPDATE_BRIDGE_3 || gameState == FORMED_BRIDGE_3)
+//			color = bridge2;
+//		else if (gameState == UPDATE_PILLAR || gameState == PILLAR_RISED)
+//			color = pillarRisen;
+//		else if (gameState == FINISHED_GAME)
+//			color = finishGame;
+//		else
+//			color = original;
 	end
 
 endmodule

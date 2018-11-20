@@ -62,6 +62,7 @@ spriteFSM sprite(
   .resetn(resetn),
   .move(move),
   .dir(dir),
+  .gameState(gameState),
   .plot(drawOnVGA_Sprite),
   .color(color_sprite),
   .x_pos(x_pos),
