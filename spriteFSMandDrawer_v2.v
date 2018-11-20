@@ -5,6 +5,13 @@
 module spriteFSM(
 	input clock, resetn, move,
 	input [1:0] dir,
+	input [3:0] gameState,
+
+	// output below is sent to gameState so it knows where the character is
+	output [8:0] x_pos,
+	output [7:0] y_pos,
+
+	// output below is for the VGA
 	output plot,
 	output [2:0] color,
 	output [8:0] xCoord,
@@ -12,26 +19,30 @@ module spriteFSM(
 );
 
 	wire doneDraw, drawChar, drawBG;				// communication signals between spriteDrawer and spriteInfo
-	wire [8:0] x_pos;
-	wire [7:0] y_pos;
+	wire [8:0] x;
+	assign x_pos = x;
+	wire [7:0] y;
+	assign y_pos = y;
 
 	moveSprite spriteInfo(
 		.move(move),
 		.clock(clock),
 		.resetn(resetn),
+		.gameState(gameState),
 		.doneChar(doneDraw),
 		.doneBG(doneDraw),
 		.dir(dir),
 		.drawChar(drawChar),
 		.drawBG(drawBG),
-		.xCoordinate(x_pos),
-		.yCoordinate(y_pos)
+		.xCoordinate(x),
+		.yCoordinate(y)
 	);
 
 	spriteDrawer drawer(
 		.clock(clock),
-		.data_x(x_pos),
-		.data_y(y_pos),
+		.data_x(x),
+		.data_y(y),
+		.gameState(gameState),
 		.resetn(resetn),
 		.drawChar(drawChar),
 		.drawBG(drawBG),
@@ -47,6 +58,7 @@ endmodule
 module spriteDrawer(
 	input [8:0] data_x,
 	input [7:0] data_y,
+	input [3:0] gameState,
 	input resetn, drawChar, drawBG, clock,
 	output [8:0] xCoordinate,
 	output [7:0] yCoordinate,
@@ -83,6 +95,7 @@ module spriteDrawer(
 		.drawBG(drawBG),
 		.data_x(data_x),
 		.data_y(data_y),
+		.gameState(gameState),
 		.load_color(load_color),
 		.colorToDraw(colorToDraw),
 		.Counter(Counter),
@@ -166,7 +179,8 @@ module datapath1(
 	input load_data, load_color, counterPlus, out, draw,
 	input [8:0] data_x,
 	input [7:0] data_y,
-//	input [2:0] colorIn,
+	input [3:0] gameState,
+
 	output reg drawOnVGA,
 	output reg [2:0] colorToDraw,
 	output reg [3:0] Counter,
@@ -181,7 +195,7 @@ module datapath1(
 	reg [2:0] color;			// the color of the current pixel we're trying to draw
 	// this is not the output for insurance, instead the color output is loaded from this
 
-	getBackgroundPixel bg(.clock(clk), .X(X + Counter[1:0]), .Y(Y + Counter[3:2]), .color(background_color));
+	getBackgroundPixel bg(.clock(clk), .gameState(gameState), .X(X + Counter[1:0]), .Y(Y + Counter[3:2]), .color(background_color));
 
 	// should this use the clock as well?
 	always @(*) begin
@@ -198,7 +212,7 @@ module datapath1(
 		if (!resetn) begin
 			X <= 9'd0;
 			Y <= 8'd16;
-			colorToDraw <= background_color;			// hmm maybe use nonblocking statements...
+			colorToDraw <= background_color;
 			Counter <= 4'b0;
 			drawOnVGA <= 1'b0;
 			xCoordinate <= 9'd1;

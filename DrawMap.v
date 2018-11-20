@@ -4,6 +4,11 @@
 module DrawMapFSM(
   input clock, drawMap,
   input [3:0] gameState,
+  // input about info for where the character is when the map changes
+  input [8:0] x_pos,
+  input [7:0] y_pos,
+
+  // output for VGA
   output reg drawOnVGA,
   output reg [2:0] color,
   output reg [8:0] X,
@@ -11,10 +16,10 @@ module DrawMapFSM(
   output doneRedraw  // Send to gameState to tell it that the update has been completed
 );
 
-  wire drawOnVGA_char, drawOnVGA_Map;   // connected to output
   wire done, draw, nextPixel, doneChar, drawChar, initialize; // connections between the modules
 
-
+  // ********************************** FOR THE VGA OUTPUT *************************
+  wire drawOnVGA_char, drawOnVGA_Map;   // connected to output
   wire [2:0] color_char, color_BG;
   wire [8:0] X_char, X_BG;
   wire [7:0] Y_char, Y_BG;
@@ -33,6 +38,7 @@ module DrawMapFSM(
       color = color_BG;
     end
   end
+// *********************************************************
 
   DrawMapControl dmControl(
     .clock(clock),
@@ -59,57 +65,11 @@ module DrawMapFSM(
     .color(color_BG)
   );
 
-  // The initial x and y positions of the character depending on the game state
-  reg [8:0] x_initial_pos;
-  reg [7:0] y_initial_pos;
-
-  localparam
-    DRAW_INITIAL = 4'd10,
-    INITIAL = 4'd0,
-    UPDATE_BRIDGE_1 = 4'd1,
-    FORMED_BRIDGE_1 = 4'd2,
-    UPDATE_BRIDGE_2 = 4'd3,
-    FORMED_BRIDGE_2 = 4'd4,
-    UPDATE_BRIDGE_3 = 4'd5,
-    FORMED_BRIDGE_3 = 4'd6,
-    UPDATE_PILLAR = 4'd7,
-    PILLAR_RISED = 4'd8,
-    FINISHED_GAME = 4'd9;
-
-  always @(*) begin
-    case(gameState)
-		DRAW_INITIAL, INITIAL: begin
-			x_initial_pos = 9'd95;
-			y_initial_pos = 8'd221;
-		end
-    UPDATE_BRIDGE_1, FORMED_BRIDGE_1: begin
-      x_initial_pos = 9'd124;
-      y_initial_pos = 8'd158;
-    end
-    UPDATE_BRIDGE_2, FORMED_BRIDGE_2: begin
-      x_initial_pos = 9'd193;
-      y_initial_pos = 8'd153;
-    end
-    UPDATE_BRIDGE_3, FORMED_BRIDGE_3: begin
-      x_initial_pos = 9'd180;
-      y_initial_pos = 8'd215;
-    end
-    UPDATE_PILLAR, PILLAR_RISED: begin
-      x_initial_pos = 9'd124;
-      y_initial_pos = 8'd86;
-    end
-    default:  begin
-        x_initial_pos = 9'd95;
-        y_initial_pos = 8'd221;
-        end
-    endcase
-  end
-
   // Used for redrawing the sprite after the background has been drawn
   spriteDrawer drawer(
 		.clock(clock),
-		.data_x(x_initial_pos),
-		.data_y(y_initial_pos),
+		.data_x(x_pos),
+		.data_y(y_pos),
 		.resetn(!initialize),
 		.drawChar(drawChar),
 		.drawBG(1'b0),
@@ -144,7 +104,7 @@ module DrawMapControl(
       WAIT_COLOR: next_state = DRAW;                // Wait state so we can get the color from ROM
       DRAW: next_state = NEXT_PIXEL;                // Draw the pixel
       NEXT_PIXEL: next_state = done? DRAW_CHAR: WAIT_COLOR;  // Get the next pixel or go to done
-      DRAW_CHAR: next_state = WAIT_CHAR;
+      DRAW_CHAR: next_state = WAIT_CHAR;              // Draw the character on the screen
       WAIT_CHAR: next_state = doneChar? DONE: WAIT_CHAR;
       DONE: next_state = go? DONE: INACTIVE;        // Done clearing the screen
       default: next_state = INACTIVE;

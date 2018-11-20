@@ -1,4 +1,6 @@
-module vga_test(
+// This is the highest level module of the project
+
+module finalProject_Top(
 	input [3:0] KEY,
 	input [9:0] SW,
 	input CLOCK_50,
@@ -9,10 +11,10 @@ module vga_test(
 
 	wire resetn = KEY[0];
 	wire move = ~KEY[1];
+	wire activate = ~KEY[2];
 	wire resetnMonitor = KEY[3];
-	wire drawMap = ~KEY[2];
 	wire [1:0] dir = SW[1:0];
-	assign LEDR[3] = drawMap;			// LED to indicate when the board is being cleared/reset
+	assign LEDR[3] = activate;			// LED to indicate when the board is being cleared/reset
 
 	wire plot;
 	wire [2:0] color;
@@ -23,7 +25,7 @@ module vga_test(
 		.clock(CLOCK_50),
 		.resetn(resetn),
 		.move(move),
-		.drawMap(drawMap),
+		.activate(activate),
 		.dir(dir),
 		.plot(plot),
 		.color(color),

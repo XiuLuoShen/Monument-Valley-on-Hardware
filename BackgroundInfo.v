@@ -16,15 +16,16 @@ module getBackgroundPixel(
 		memoryAddress = Y*9'd320 + X;
 	end
 
-	// ROM Modules and their corresponding wires here:
+	//**************** ROM Modules and their corresponding wires here:
 	wire [2:0] original;
 	BG_original bg1(.address(memoryAddress), .clock(clock), .q(original));
-	
+
 	wire [2:0] bridge2;
 	Bridge2Formed bg2(.address(memoryAddress), .clock(clock), .q(bridge2));
-	
+
 	wire [2:0] pillarRisen;
 	PillarRisen bg3(.address(memoryAddress), .clock(clock), .q(pillarRisen));
+	// ***************
 
 	localparam
 		DRAW_INITIAL = 4'd10,
@@ -39,15 +40,17 @@ module getBackgroundPixel(
 		PILLAR_RISED = 4'd8,
 		FINISHED_GAME = 4'd9;
 
+
+	// The memory block that is used to determine the color changes depending on the gameState
 	always @(*) begin
 		if (gameState == DRAW_INITIAL || gameState == INITIAL)
 			color = original;
 		else if (gameState == UPDATE_BRIDGE_1 || gameState == FORMED_BRIDGE_1)
 			color = bridge2;
 		else if (gameState == UPDATE_BRIDGE_2 || gameState == FORMED_BRIDGE_2)
-			color = bridge2;
-		else if (gameState == UPDATE_BRIDGE_3 || gameState == FORMED_BRIDGE_3)
 			color = pillarRisen;
+		else if (gameState == UPDATE_BRIDGE_3 || gameState == FORMED_BRIDGE_3)
+			color = bridge2;
 		else if (gameState == UPDATE_PILLAR || gameState == PILLAR_RISED)
 			color = pillarRisen;
 		else
