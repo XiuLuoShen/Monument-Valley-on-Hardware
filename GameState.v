@@ -7,6 +7,7 @@ module GameState(
   input activate,
   input [8:0] charX,
   input [7:0] charY,
+  // might need an output that connects to drawMap telling to draw
   output reg [3:0] gameState
 );
   reg [3:0] currentState, nextState;
@@ -14,17 +15,21 @@ module GameState(
   // States called UPDATE_X refer to when the background is being redrawn to reflect the change
   // Might require wait states between update and formed states
   localparam
-    DRAW_INITIAL = 4'10,
-    INITIAL = 4'b0,
-    UPDATE_BRIDGE_1 = 4'b1,
-    FORMED_BRIDGE_1 = 4'b2,
-    UPDATE_BRIDGE_2 = 4'b3,
-    FORMED_BRIDGE_2 = 4'b4,
-    UPDATE_BRIDGE_3 = 4'b5,
-    FORMED_BRIDGE_3 = 4'b6,
-    UPDATE_PILLAR = 4'b7,
-    PILLAR_RISED = 4'b8,
-    FINISHED_GAME = 4'b9;
+<<<<<<< HEAD
+    DRAW_INITIAL = 4'd10,
+=======
+    DRAW_INITIAL = 4'd0,
+>>>>>>> aeea77dc1ebf75a5d5b062b5157120fe07828f92
+    INITIAL = 4'd0,
+    UPDATE_BRIDGE_1 = 4'd1,
+    FORMED_BRIDGE_1 = 4'd2,
+    UPDATE_BRIDGE_2 = 4'd3,
+    FORMED_BRIDGE_2 = 4'd4,
+    UPDATE_BRIDGE_3 = 4'd5,
+    FORMED_BRIDGE_3 = 4'd6,
+    UPDATE_PILLAR = 4'd7,
+    PILLAR_RISED = 4'd8,
+    FINISHED_GAME = 4'd9;
 
 
   // state_table

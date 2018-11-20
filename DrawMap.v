@@ -3,15 +3,25 @@
 
 module DrawMapFSM(
   input clock, drawMap,
-  input [3:0] gameState.
+  input [3:0] gameState,
+<<<<<<< HEAD
   output drawOnVGA,
   output reg [2:0] color,
   output reg [8:0] X,
-  output reg [7:0] Y
+  output reg [7:0] Y,
   output doneRedraw,  // Send to gameState to tell it that the update has been completed
+=======
+  output reg drawOnVGA,
+  output reg [2:0] color,
+  output reg [8:0] X,
+  output reg [7:0] Y,
+  output doneRedraw  // Send to gameState to tell it that the update has been completed
+>>>>>>> aeea77dc1ebf75a5d5b062b5157120fe07828f92
 );
 
-  wire done, draw, nextPixel, doneChar, drawChar;
+  wire drawOnVGA_char, drawOnVGA_Map;   // connected to output
+  wire done, draw, nextPixel, doneChar, drawChar, initialize; // connections between the modules
+
 
   wire [2:0] color_char, color_BG;
   wire [8:0] X_char, X_BG;
@@ -19,15 +29,15 @@ module DrawMapFSM(
 
   always @(*) begin
     if (drawChar) begin
-      X = X_Char;
-      Y = Y_Char;
+      X = X_char;
+      Y = Y_char;
       drawOnVGA = drawOnVGA_char;
       color = color_char;
     end
     else begin
       X = X_BG;
       Y = Y_BG;
-      drawOnVGA = drawOnVGA_BG;
+      drawOnVGA = drawOnVGA_Map;
       color = color_BG;
     end
   end
@@ -41,15 +51,16 @@ module DrawMapFSM(
     .draw(draw),
     .drawChar(drawChar),
     .doneRedraw(doneRedraw),
+    .initialize(initialize)
   );
 
   DrawMapDataPath dmDP(
     .clock(clock),
-    .go(clear),
+    .initialize(initialize),
     .draw(draw),
     .nextPixel(nextPixel),
     .gameState(gameState),
-    .drawOnVGA(drawOnVGA_BG),
+    .drawOnVGA(drawOnVGA_Map),
     .done(done),
     .X(X_BG),
     .Y(Y_BG),
@@ -61,32 +72,56 @@ module DrawMapFSM(
   reg [7:0] y_initial_pos;
 
   localparam
-    DRAW_INITIAL = 4'10,
-    INITIAL = 4'b0,
-    UPDATE_BRIDGE_1 = 4'b1,
-    FORMED_BRIDGE_1 = 4'b2,
-    UPDATE_BRIDGE_2 = 4'b3,
-    FORMED_BRIDGE_2 = 4'b4,
-    UPDATE_BRIDGE_3 = 4'b5,
-    FORMED_BRIDGE_3 = 4'b6,
-    UPDATE_PILLAR = 4'b7,
-    PILLAR_RISED = 4'b8,
-    FINISHED_GAME = 4'b9;
+    DRAW_INITIAL = 4'd10,
+    INITIAL = 4'd0,
+    UPDATE_BRIDGE_1 = 4'd1,
+    FORMED_BRIDGE_1 = 4'd2,
+    UPDATE_BRIDGE_2 = 4'd3,
+    FORMED_BRIDGE_2 = 4'd4,
+    UPDATE_BRIDGE_3 = 4'd5,
+    FORMED_BRIDGE_3 = 4'd6,
+    UPDATE_PILLAR = 4'd7,
+    PILLAR_RISED = 4'd8,
+    FINISHED_GAME = 4'd9;
 
   always @(*) begin
     case(gameState)
-      DRAW_INITIAL:
-      INITIAL:
-      UPDATE_BRIDGE_1:
-      FORMED_BRIDGE_1:
-      UPDATE_BRIDGE_2:
-      FORMED_BRIDGE_2:
-      UPDATE_BRIDGE_3:
-      FORMED_BRIDGE_3:
-      UPDATE_PILLAR:
-      PILLAR_RISED:
-      FINISHED_GAME:
+<<<<<<< HEAD
+      DRAW_INITIAL: // when the drawing occurs
+      INITIAL: // idle state
+      UPDATE_BRIDGE_1: x_initial_pos = 9'd160 && y_initial_pos = 8'd122; // Start of moving platform
+      FORMED_BRIDGE_1: x_initial_pos = 9'd160 && y_initial_pos = 8'd122; // Start of moving platform
+      UPDATE_BRIDGE_2: x_initial_pos = 9'd192 && y_initial_pos = 8'd154; // Second button
+      FORMED_BRIDGE_2: x_initial_pos = 9'd192 && y_initial_pos = 8'd154; // Second button
+      UPDATE_BRIDGE_3: x_initial_pos = 9'd179 && y_initial_pos = 8'd213; // End of island
+      FORMED_BRIDGE_3: x_initial_pos = 9'd179 && y_initial_pos = 8'd213; // End of island
+      UPDATE_PILLAR: x_initial_pos = 9'd124 && y_initial_pos = 8'd158; // Raising platform
+      PILLAR_RISED: x_initial_pos = 9'd124 && y_initial_pos = 8'd86; // Platform reaches top
+      FINISHED_GAME: x_initial_pos = 9'd158 && y_initial_pos = 8'd52; // End
       default:  begin
+=======
+		DRAW_INITIAL, INITIAL: begin
+			x_initial_pos = 9'd95;
+			y_initial_pos = 8'd221;
+		end
+    UPDATE_BRIDGE_1, FORMED_BRIDGE_1: begin
+      x_initial_pos = 9'd124;
+      y_initial_pos = 8'd158;
+    end
+    UPDATE_BRIDGE_2, FORMED_BRIDGE_2: begin
+      x_initial_pos = 9'd193;
+      y_initial_pos = 8'd153;
+    end
+    UPDATE_BRIDGE_3, FORMED_BRIDGE_3: begin
+      x_initial_pos = 9'd180;
+      y_initial_pos = 8'd215;
+    end
+    UPDATE_PILLAR, PILLAR_RISED: begin
+      x_initial_pos = 9'd124;
+      y_initial_pos = 8'd86;
+    end
+    default:  begin
+>>>>>>> aeea77dc1ebf75a5d5b062b5157120fe07828f92
         x_initial_pos = 9'd95;
         y_initial_pos = 8'd221;
         end
@@ -94,25 +129,26 @@ module DrawMapFSM(
   end
 
   // Used for redrawing the sprite after the background has been drawn
+  // from spriteFSMandDrawer_v2.v
   spriteDrawer drawer(
 		.clock(clock),
 		.data_x(x_initial_pos),
 		.data_y(y_initial_pos),
-		.resetn(resetn),
+		.resetn(!initialize),
 		.drawChar(drawChar),
 		.drawBG(1'b0),
 		.xCoordinate(X_char),
 		.yCoordinate(Y_char),
 		.drawOnVGA(drawOnVGA_char),
 		.colorToDraw(color_char),
-		.doneDraw(doneChar),
+		.doneDraw(doneChar)
 		);
 
 endmodule
 
 module DrawMapControl(
   input clock, go, done, doneChar,
-  output reg nextPixel, draw, drawChar, doneRedraw
+  output reg nextPixel, draw, drawChar, doneRedraw, initialize
 );
 
   reg [2:0] current_state, next_state;
@@ -144,11 +180,14 @@ module DrawMapControl(
     nextPixel = 1'b0;
     drawChar = 1'b0;
     doneRedraw = 1'b0;
+    initialize = 1'b0;
 
     case(current_state)
+      INACTIVE: initialize = 1'b1;
       DRAW: draw = 1'b1;
       NEXT_PIXEL: nextPixel = 1'b1;
       DRAW_CHAR: drawChar = 1'b1;
+	    WAIT_CHAR: drawChar = 1'b1;
       DONE: doneRedraw = 1'b1;
       default: begin
         draw = 1'b0;
@@ -168,7 +207,7 @@ endmodule
 
 
 module DrawMapDataPath(
-  input clock, go, draw, nextPixel,
+  input clock, initialize, draw, nextPixel,
   input [3:0] gameState,
   output reg drawOnVGA, done,
   output reg [8:0] X,
@@ -182,7 +221,7 @@ module DrawMapDataPath(
   getBackgroundPixel bg(.clock(clock), .gameState(gameState), .X(xPixel), .Y(yPixel), .color(color));
 
   always @(posedge clock) begin
-    if (!go) begin
+    if (initialize) begin
       xPixel = 9'b0;
       yPixel = 8'b0;
       drawOnVGA = 1'b0;
