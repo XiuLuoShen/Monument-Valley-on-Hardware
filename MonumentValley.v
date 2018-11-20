@@ -3,6 +3,7 @@
 module MonumentValley(
   input clock, resetn, drawMap, move,
   input [2:0] dir,
+  input [3:0] gameState,
   output reg plot,      // Connects to vga adapter telling to draw pixel X, Y with color
   output reg [2:0] color,
   output reg [8:0] X,   // Coordinates for the vga adapater to draw at
@@ -57,12 +58,12 @@ spriteFSM sprite(
   );
 
   wire doneRedraw;
+  
 DrawMapFSM MapDrawer(
     .clock(clock),
     .drawMap(drawMap),     // not sure if resetn is needed
-	 .resetn(resetn),
     .drawOnVGA(drawOnVGA_Map),
-	 .gameState(4'b000),
+	 .gameState(gameState),
     .color(color_Map),
     .X(X_Map),
     .Y(Y_Map),

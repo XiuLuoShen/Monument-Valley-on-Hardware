@@ -203,7 +203,7 @@ module moveSpriteDataPath(
 
         // top of platform to end
         else if (newY == 8'd210 - newX)	begin
-          if (newX >= 8'd158 && newX <= 8'd124)
+          if (newX <= 8'd158 && newX >= 8'd124)
             validMove = 1'b1;
 			end
 
