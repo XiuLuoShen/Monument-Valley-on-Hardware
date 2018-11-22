@@ -1,9 +1,9 @@
-// These modules are for the FSM that work with movement
-// Modified movementLogic that should work with only 1 button now
+// This file is used to allow the sprite move free around the screen for testing purposes
 
 module moveSprite(
   input move, resetn, clock, doneChar, doneBG,
   input [1:0] dir,
+  input [3:0] gameState,
   output [8:0] xCoordinate, // For 320x240 res...
   output [7:0] yCoordinate,
   output drawChar, drawBG         // THESE ARE SIGNALS SENT TO THE SPRITE DRAWER FSM TELLING IT TO DRAW THE BG OR CHAR
@@ -150,63 +150,17 @@ module moveSpriteDataPath(
 
     else  begin
       if (checkMove) begin
-        if (newX <= 1'b0 || newY <= 1'b0)
+        if (newX <= 1'b0 || newY <= 1'b0 || newX > 9'd320 || newY > 8'd240)
           validMove = 1'b0; // ensures the square does not go off screen
 
-		  else if (newX == 8'd120 && newY == 8'd196) begin
-				teleport = 1'b1;
-				validMove = 1'b1;
-			end
+        else if (newX == 8'd120 && newY == 8'd196) begin
+  				teleport = 1'b1;
+  				validMove = 1'b1;
+	      end
 
-        // starting point to first door
-        else if (newY == 9'd316 - newX) begin // diagonal BL to TR
-          if (newX <= 8'd120 && newX >= 8'd95)
-            validMove = 1'b1;
-			end
-
-        // door to first corner
-        else if (newY == newX - 8'd58) begin // diagonal TL to BR
-          if (newX >= 8'd126 && newX <= 8'd170)
-            validMove = 1'b1;
-			end
-
-        // first corner to first button
-        else if (newY == 9'd282 - newX)	begin
-          if (newX >= 8'd124 && newX <= 8'd170)
-            validMove = 1'b1;
-			end
-
-        // first button to moving platform
-        else if (newY == 9'd282 - newX)	begin
-          if (newX >= 8'd124 && newX <= 8'd160)
-            validMove = 1'b1;
-			end
-
-        // moving platform to island
-        else if (newY == newX - 8'd38)	begin
-          if (newX >= 8'd160 & newX <= 8'd216)
-            validMove = 1'b1;
-			end
-
-        // island
-        else if (newY == 9'd392 - newX) begin
-          if (newX >= 8'd179 && newX <= 8'd215)
-            validMove = 1'b1;
-			end
-
-        // island to first button again
-        else if (newY == newX - 8'd89)	begin
-          if (newX >= 8'd124 && newX <= 8'd179)
-            validMove = 1'b1;
-			end
-
-        // top of platform to end
-        else if (newY == 8'd210 - newX)	begin
-          if (newX <= 8'd158 && newX >= 8'd124)
-            validMove = 1'b1;
-			end
-
-        else validMove = 1'b0;
+        else begin
+          validMove = 1'b1;
+			 end
       end
 
       if (update_pos) begin
@@ -214,12 +168,14 @@ module moveSpriteDataPath(
 			     X <= 9'd126;
 		       Y <= 8'd68;
         end
-		   else begin
-        X <= newX;
-        Y <= newY;
-       end
-		  validMove <= 1'b0;
-		  teleport <= 1'b0;
+
+        else begin
+          X <= newX;
+          Y <= newY;
+        end
+
+        validMove <= 1'b0;
+        teleport <= 1'b0;
         end
     end
 
