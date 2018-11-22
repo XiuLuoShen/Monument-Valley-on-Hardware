@@ -42,7 +42,7 @@ module GameState(
         end
 
       INITIAL: begin
-        if (X == 9'd124 && Y == 9'd158 && activate)
+        if (X >= 9'd120 && X <= 9'd125 && Y >= 9'd156 && Y <= 9'd161 && activate)
           nextState = UPDATE_BRIDGE_1;
         else
           nextState = INITIAL;
@@ -56,9 +56,9 @@ module GameState(
         end
 
       FORMED_BRIDGE_1: begin
-        if (X == 9'd187 && Y == 9'd149 && activate)     // Proceed to next state
+        if (X >= 9'd189 && X <= 9'd194 && Y >= 9'd151 && Y <= 9'd156 && activate)     // Proceed to next state
           nextState = UPDATE_BRIDGE_2;
-        else if (X == 9'd124 && Y == 9'd158 && activate)  // Return to previous
+        else if (X >= 9'd120 && X <= 9'd125 && Y >= 9'd156 && Y <= 9'd161 && activate)  // Return to previous
           nextState = DRAW_INITIAL;
         else
           nextState = FORMED_BRIDGE_1;
@@ -72,9 +72,9 @@ module GameState(
         end
 
       FORMED_BRIDGE_2:  begin
-        if (X == 9'd180 && Y == 9'd214 && activate)     // Proceed to next state
+        if (X >= 9'd177 && X <= 9'd182 && Y >= 9'd213 && Y <= 9'd218 && activate)     // Proceed to next state
           nextState = UPDATE_BRIDGE_3;
-        else if (X == 9'd187 && Y == 9'd149 && activate)  // Return to previous
+        else if (X >= 9'd189 && X <= 9'd194 && Y >= 9'd151 && Y <= 9'd156 && activate)  // Return to previous
           nextState = UPDATE_BRIDGE_1;
         else
           nextState = FORMED_BRIDGE_2;
