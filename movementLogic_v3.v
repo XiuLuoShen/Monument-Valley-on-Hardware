@@ -121,23 +121,25 @@ module moveSpriteDataPath(
   reg teleport;
 
   always @(posedge clock) begin
-    case (dir)
+    case (dir[0])
       0: begin  // down left
         newX = X + 1'b1;
-        newY = Y + 1'b1;
         end
       1: begin  // down right
          newX = X - 1'b1;
-         newY = Y + 1'b1;
         end
-      2:begin   // up left
-        newX = X + 1'b1;
+      default:
+        newX = X;
+      endcase
+    case (dir[1])
+      0: begin  // down left
+        newY = Y + 1'b1;
+        end
+      1: begin  // down right
         newY = Y - 1'b1;
         end
-      3:begin // up right
-        newX = X - 1'b1;
-        newY = Y - 1'b1;
-        end
+      default:
+        newY = Y;
     endcase
   end
 
@@ -216,7 +218,7 @@ module moveSpriteDataPath(
 			end
 
       // original path to end
-        
+
         else if (newY <= 8'd215 - newX && newY >= 8'd208 - newX && newX >= 8'd129 && newX <= 8'd166) begin
             validMove = 1'b1;
       end

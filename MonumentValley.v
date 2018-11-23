@@ -14,15 +14,19 @@ module MonumentValley(
 wire [8:0] x_pos;			// Outputs from SpriteFSM regarding the character's location
 wire [7:0] y_pos;
 wire [3:0] gameState;	// Output from module GameState
-wire drawMap;	// Output from module GameState
+wire drawMap, startAnimation;	// Output from module GameState
+wire doneRedraw, doneAnimation; // Outputs from map drawer and animator to gameState
 
 
 
 // *********************** Wires for plotting to VGA *******************
 wire drawOnVGA_Sprite;
-wire drawOnVGA_Map;			// Maybe connect this to map later
+wire drawOnVGA_Map;
+wire drawOnVGA_Animation;
 always @(*) begin
-  if (drawMap)
+  if (startAnimation)
+    plot = drawOnVGA_Animation;
+  else if (drawMap)
     plot = drawOnVGA_Map;
   else if (move)
     plot = drawOnVGA_Sprite;
@@ -30,13 +34,15 @@ always @(*) begin
     plot = 1'b0;
 end
 
-wire [8:0] X_Map;
-wire [7:0] Y_Map;
-wire [8:0] X_sprite;
-wire [7:0] Y_sprite;
+wire [8:0] X_Map, X_sprite, animationX;
+wire [7:0] Y_Map, Y_sprite, animationY;
 
 always @(*) begin
-  if (drawMap) begin
+  if (startAnimation) begin
+    X = animationX;
+    Y = animationY;
+  end
+  else if (drawMap) begin
     X = X_Map;
     Y = Y_Map;
   end
@@ -46,10 +52,11 @@ always @(*) begin
   end
 end
 
-wire [2:0] color_sprite;
-wire [2:0] color_Map;
+wire [2:0] color_sprite, color_Map, colorAnimation;
 always @(*) begin
-  if (move)
+  if (startAnimation)
+    color = colorAnimation;
+  else if (move)
     color = color_sprite;
   else
     color = color_Map;
@@ -71,8 +78,7 @@ spriteFSM sprite(
   .yCoord(Y_sprite)
   );
 
-  wire doneRedraw;
-  
+
 DrawMapFSM MapDrawer(
     .clock(clock),
 	 .gameState(gameState),
@@ -86,16 +92,25 @@ DrawMapFSM MapDrawer(
 	 .doneRedraw(doneRedraw)
   );
 
-  
+
 GameState GAME(
 	.clock(clock),
 	.resetn(resetn),
 	.spriteDead(1'b0),	// Haven't implemented this yet
 	.doneRedraw(doneRedraw),
+  .doneAnimation(doneAnimation),
 	.X(x_pos),
 	.Y(y_pos),
 	.activate(activate),
 	.drawMap(drawMap),
+  .startAnimation(startAnimation),
 	.gameState(gameState)
  );
+
+ pillarAnimator pillar(
+   .clock(clock), .resetn(resetn), .start(startAnimation), .char_X(x_pos), .char_Y(y_pos),
+   .drawOnVGA_Animation(drawOnVGA_Animation), .animationX(animationX), .animationY(animationY),
+   .animationColor(animationColor),
+   .doneAnimation(doneAnimation)
+   );
 endmodule

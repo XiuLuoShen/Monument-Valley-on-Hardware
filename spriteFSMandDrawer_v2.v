@@ -128,7 +128,7 @@ module control1(
 			GET_COLOR: next_state = DRAW;
 			DRAW:		next_state = INCREASE_COUNT;						// set plot to 1
 			INCREASE_COUNT:	next_state = (Counter == 4'd15)? DONE : PREPARE_TO_DRAW;
-			DONE:	next_state = (drawChar) ? DONE: WAIT;
+			DONE:	next_state = (drawChar || drawBG) ? DONE: WAIT;
 		endcase
 	end
 
