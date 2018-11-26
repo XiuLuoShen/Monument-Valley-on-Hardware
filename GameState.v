@@ -89,9 +89,9 @@ module GameState(
         end
 
       FORMED_BRIDGE_3:  begin
-        if (X == 9'd124 && Y == 9'd158 && activate)     // Proceed to next state
+        if (X >= 9'd120 && X <= 9'd125 && Y >= 9'd156 && Y <= 9'd161 && activate)     // Proceed to next state
           nextState = ANIMATE_PILLAR;
-        else if (X == 9'd180 && Y == 8'd214 && activate)  // Return to previous
+        else if (X >= 9'd177 && X <= 9'd182 && Y >= 9'd213 && Y <= 9'd218 && activate)  // Return to previous
           nextState = UPDATE_BRIDGE_2;
         else
           nextState = FORMED_BRIDGE_3;
