@@ -110,7 +110,7 @@ GameState GAME(
  pillarAnimator pillar(
    .clock(clock), .resetn(resetn), .start(startAnimation), .char_X(x_pos), .char_Y(y_pos),
    .drawOnVGA_Animation(drawOnVGA_Animation), .animationX(animationX), .animationY(animationY),
-   .animationColor(animationColor),
+   .animationColor(colorAnimation),
    .doneAnimation(doneAnimation)
    );
 endmodule

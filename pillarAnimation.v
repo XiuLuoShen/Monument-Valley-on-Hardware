@@ -125,7 +125,7 @@ module animationControl(
     case(currentState)
       DRAW_PILLAR: drawPillar = 1'b1;
       DRAW_CHAR:  drawSprite = 1'b1;
-      DONE: doneAnimation = 1'b1;
+      DONE: doneAnimation = 1'b1 & start;
       default: begin
         drawPillar = 1'b0;
         drawSprite = 1'b0;
