@@ -15,6 +15,8 @@ module PS2_Controller #(parameter INITIALIZE_MOUSE = 0) (
 	send_command,
 
 	// Bidirectionals
+	// These lines should be connected to the correspondingly named pins on the DE1_SoC board, 
+	// as defined in the DE1_SoC.qsf file.
 	PS2_CLK,					// PS2 Clock
  	PS2_DAT,					// PS2 Data
 

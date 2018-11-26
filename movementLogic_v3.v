@@ -120,6 +120,17 @@ module moveSpriteDataPath(
   reg [7:0] newY;
   reg teleport;
 
+  /* 
+
+  Keyboard make codes
+
+  UP: 2  E0,75
+  LEFT: 0  E0,6B
+  DOWN: 1  E0,72
+  RIGHT: 3 E0,74
+
+  */
+
   always @(posedge clock) begin
     case (dir)
       0: begin  // down left
@@ -182,37 +193,38 @@ module moveSpriteDataPath(
           else validMove = 1'b1;
 			end
 
-        // first button to moving platform
-
-        // skip this for now
-
-   //      else if (newY == 9'd282 - newX)	begin // [bottom diagonal] && [top diagonal]
-   //        if ((newX >= 8'd && newX <= 8'd) || (newX >= 8'd && newX <= 8'd))
-   //          validMove = 1'b1;
-			// end
-
         // moving platform to island
         else if (newY <= newX - 8'd30 && newY >= newX - 8'd44 && newX >= 9'd152 && newX <= 9'd227)	begin
           if (newY <= 9'd276 - newX && newX <= 8'd161)
             validMove = 1'b0;
-          else if (newY <= 9'd276 - newX && newX >= 8'd214) // change this
+          else if (newY <= 9'd401 - newX && newX >= 8'd214)
             validMove = 1'b0;
           else validMove = 1'b1;
 			end
 
         // island
         else if (newY >= 9'd387 - newX && newY <= 9'd400 - newX && newX >= 8'd171 && newX <= 9'd227) begin
-            validMove = 1'b1;
+          if (newY <= 9'd276 - newX && newX >= 8'd217)
+            validMove = 1'b0;
+          else if (newY >= newX + 42 && newX >= 8'd179)
+            validMove = 1'b0;
+          else validMove = 1'b1;
 			end
 
         // island to first button again
         else if (newY <= newX + 8'd42 && newY >= newX + 8'd30 && newX >= 8'd116 && newX <= 8'd190)	begin
-            validMove = 1'b1;
+          if (newY <= 9'd274 - newX && newX >= 8'd124)
+            validMove = 1'b0;
+          // else if (newY <= newX + 42 && newX >= 8'd179) NOT SURE IF THIS IS NEEDED? CHECK THE ISLAND BUTTON AREA AGAIN
+            validMove = 1'b0;
+          else validMove = 1'b1;
 			end
 
         // top of platform to original path
-        else if (newY <= 8'd220 - newX && newY >= 8'd203 - newX && newX >= 8'd116 && newX <= 8'd144)	begin
-            validMove = 1'b1;
+        else if (newY <= 8'd217 - newX && newY >= 8'd203 - newX && newX >= 8'd116 && newX <= 8'd136)	begin
+          if (newY <= newX - 8'd32 && newX <= 8'd125)
+            validMove = 1'b0;
+          else validMove = 1'b1;
 			end
 
       // original path to end

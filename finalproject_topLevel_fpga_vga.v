@@ -13,6 +13,8 @@ module finalProject_Top(
 	wire move = ~KEY[1];
 	wire activate = ~KEY[2];
 	wire resetnMonitor = KEY[3];
+
+  // potentially reg for dir
 	wire [1:0] dir = SW[1:0];
 	assign LEDR[3] = activate;			// LED to indicate when the board is being cleared/reset
 
@@ -20,6 +22,28 @@ module finalProject_Top(
 	wire [2:0] color;
 	wire [8:0] X;
 	wire [7:0] Y;
+
+
+
+	always @ (posedge CLOCK_50)
+		if (received_data_en = 1'b1) begin
+			move = 1'b1;
+			if (received_data_en == 8'h75) // UP; topleft
+			  	dir = 8'd2;
+			else if (received_data_en == 8'h6B) // LEFT; bottomleft
+			  	dir = 8'd0;
+			else if (received_data_en == 8'h72) // DOWN; bottomright
+			  	dir = 8'd1;
+			else if (received_data_en == 8'h74) // RIGHT; topright
+			  	dir = 8'd0;
+			else dir = 8'd0;
+		end
+		else if (received_data_en = 1'b0)
+			move = 1'b0;
+	endcase
+
+
+
 
 	MonumentValley Game(
 		.clock(CLOCK_50),
@@ -32,6 +56,30 @@ module finalProject_Top(
 		.X(X),
 		.Y(Y)
 	);
+
+
+
+enable
+
+
+
+  /* 
+
+  Keyboard make codes
+
+  UP: 2  E0,75
+  LEFT: 0  E0,6B
+  DOWN: 1  E0,72
+  RIGHT: 3 E0,74
+
+
+	exclusive or for buttons, only one at a time
+	t flip flop to detect break sequence
+
+		default: 
+	endcase
+
+  */
 
 
 	vga_adapter display(
