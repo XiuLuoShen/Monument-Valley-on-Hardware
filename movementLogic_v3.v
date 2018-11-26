@@ -142,23 +142,23 @@ module moveSpriteDataPath(
   always @(posedge clock) begin
     case (dir[0])
       0: begin  // down left
-        newX = X + 1'b1;
+        newX <= X + 1'b1;
         end
       1: begin  // down right
-         newX = X - 1'b1;
+         newX <= X - 1'b1;
         end
       default:
-        newX = X;
+        newX <= X;
       endcase
     case (dir[1])
       0: begin  // down left
-        newY = Y + 1'b1;
+        newY <= Y + 1'b1;
         end
       1: begin  // down right
-        newY = Y - 1'b1;
+        newY <= Y - 1'b1;
         end
       default:
-        newY = Y;
+        newY <= Y;
     endcase
   end
 
@@ -167,7 +167,7 @@ module moveSpriteDataPath(
       X <= 9'd95;  // initial sprite location
       Y <= 8'd221;
       validMove <= 1'b0;
-	    teleport <= 1'b0;
+	   teleport <= 1'b0;
       pillarRaised <= 1'b0;
     end
 
@@ -219,7 +219,7 @@ module moveSpriteDataPath(
             validMove = 1'b0;
           else if (newY <= 9'd276 - newX && newX >= 8'd214) // change this
             validMove = 1'b0;
-          else if (gameState == FORMED_BRIDGE_1)
+          else if (gameState == FORMED_BRIDGE_1 || gameState == FORMED_BRIDGE_2 || gameState == FORMED_BRIDGE_3)
             validMove = 1'b1;
           else
             validMove = 1'b0;
@@ -261,11 +261,16 @@ module moveSpriteDataPath(
   		  validMove <= 1'b0;
   		  teleport <= 1'b0;
         end
+
       if (doneAnimation && !pillarRaised) begin  // If the animation has finished then decrease Y by 74 pixels (height of the pillar)
         pillarRaised <= 1'b1;
         X <= X;
         Y <= Y - 8'd74;
       end
+		if (gameState == FINISHED_GAME) begin
+			X <= 9'd320;
+			Y <= 8'd240;
+		end
     end
 
   end

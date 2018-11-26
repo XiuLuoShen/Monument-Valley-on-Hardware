@@ -18,16 +18,22 @@ module getBackgroundPixel(
 
 	//**************** ROM Modules and their corresponding wires here:
 	wire [2:0] original;
-	BG_original bg1(.address(memoryAddress), .clock(clock), .q(original));
-
-	wire [2:0] bridge2;
-	Bridge2Formed bg2(.address(memoryAddress), .clock(clock), .q(bridge2));
+	BG_original bg0(.address(memoryAddress), .clock(clock), .q(original));
+	
+//	wire [2:0] bridge1;
+//	Bridge2Formed bg1(.address(memoryAddress), .clock(clock), .q(bridge1));
+//
+//	wire [2:0] bridge2;
+//	Bridge2Formed bg2(.address(memoryAddress), .clock(clock), .q(bridge2));
+	
+	wire [2:0] bridge3;
+	Bridge3Formed bg3(.address(memoryAddress), .clock(clock), .q(bridge3));
 
 	wire [2:0] pillarRisen;
-	PillarRisen bg3(.address(memoryAddress), .clock(clock), .q(pillarRisen));
+	PillarRisen bg4(.address(memoryAddress), .clock(clock), .q(pillarRisen));
 
-	wire [2:0] finishGame;
-	FinishedGame bg4(.address(memoryAddress), .clock(clock), .q(finishGame));
+//	wire [2:0] finishGame;
+//	FinishedGame finished(.address(memoryAddress), .clock(clock), .q(finishGame));
 	// ***************
 
 	localparam
@@ -49,11 +55,11 @@ module getBackgroundPixel(
 	always @(*) begin
 	case(gameState)
 		DRAW_INITIAL, INITIAL: color = original;
-		UPDATE_BRIDGE_1, FORMED_BRIDGE_1:	color = bridge2;
-		UPDATE_BRIDGE_2, FORMED_BRIDGE_2:	color = pillarRisen;
-		UPDATE_BRIDGE_3, FORMED_BRIDGE_3:	color = bridge2;
+//		UPDATE_BRIDGE_1, FORMED_BRIDGE_1:	color = bridge1;
+//		UPDATE_BRIDGE_2, FORMED_BRIDGE_2:	color = bridge2;
+		UPDATE_BRIDGE_3, FORMED_BRIDGE_3:	color = bridge3;
 		UPDATE_PILLAR, PILLAR_RISED:	color = pillarRisen;
-		FINISHED_GAME:	color = finishGame;
+		FINISHED_GAME:	color = 3'b111;
 		default: color = original;
 	endcase
 	end

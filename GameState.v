@@ -103,7 +103,7 @@ module GameState(
           nextState = ANIMATE_PILLAR;
       end
       UPDATE_PILLAR: begin
-        if (doneAnimation && !activate)
+        if (doneRedraw && !activate)
           nextState = PILLAR_RISED;
         else
           nextState = UPDATE_PILLAR;
@@ -126,8 +126,8 @@ module GameState(
   // TELL THE MAPDRAWER TO DRAW THE MAP AT THESE STATES
   always @(*) begin
     if (currentState == DRAW_INITIAL || currentState == UPDATE_BRIDGE_1 || currentState ==  UPDATE_BRIDGE_2 || currentState == UPDATE_BRIDGE_3 ||
-        currentState == ANIMATE_PILLAR || currentState == FINISHED_GAME) begin
-        drawMap = 1'b1;
+        currentState == UPDATE_PILLAR || currentState == FINISHED_GAME) begin
+        drawMap = 1'b1 && !doneRedraw;
       end
     else
       drawMap = 1'b0;
