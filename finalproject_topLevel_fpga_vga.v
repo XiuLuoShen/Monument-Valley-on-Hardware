@@ -7,6 +7,17 @@ module finalProject_Top(
 	output	[7:0] VGA_R, VGA_G, VGA_B,				// these might have to be [9:0], honestly not sure
 	output 	VGA_HS, VGA_VS, VGA_BLANK, VGA_SYNC, VGA_CLK,
 	output [9:0] LEDR
+
+	// for the PS2 controller
+	input reset,
+	input [7:0] the_command,
+	input send_command,
+	inout PS2_CLK,
+	inout PS2_DAT,
+	output command_was_sent,
+	output error_communication_timed_out,
+	output [7:0] received_data,
+	output received_data_en
 	);
 
 	wire resetn = KEY[0];
@@ -24,6 +35,33 @@ module finalProject_Top(
 	wire [7:0] Y;
 
 
+	// PS2 wires
+	wire ps2_reset = reset;
+	wire command = the_command;
+	wire send_command = send_command;
+	wire ps2_clck = PS2_CLK;
+	wire ps2_dat = PS2_DAT;
+	wire command_was_sent = command_was_sent;
+	wire error_time_out = error_communication_timed_out;
+	wire received_data_en = received_data_en;
+
+
+	PS2_Controller Keyboard(
+		.clock(CLOCK_50),
+		.resetn(ps2_reset),
+		.command(the_command),
+		.send_command(send_command),
+		.ps2_clck(ps2_clck),	// PS2 Clock
+	 	.ps2_dat(ps2_dat),	// PS2 Data
+		.command_was_sent(command_was_sent),
+		.error_time_out(error_communication_timed_out),
+		.received_data(received_data),
+		.received_data_en(received_data_en)
+	);
+
+		// PS2 output wires
+	wire data = received_data;
+	wire data_en = received_data_en;
 
 	always @ (posedge CLOCK_50)
 		if (received_data_en = 1'b1) begin
@@ -42,9 +80,6 @@ module finalProject_Top(
 			move = 1'b0;
 	endcase
 
-
-
-
 	MonumentValley Game(
 		.clock(CLOCK_50),
 		.resetn(resetn),
@@ -56,30 +91,6 @@ module finalProject_Top(
 		.X(X),
 		.Y(Y)
 	);
-
-
-
-enable
-
-
-
-  /* 
-
-  Keyboard make codes
-
-  UP: 2  E0,75
-  LEFT: 0  E0,6B
-  DOWN: 1  E0,72
-  RIGHT: 3 E0,74
-
-
-	exclusive or for buttons, only one at a time
-	t flip flop to detect break sequence
-
-		default: 
-	endcase
-
-  */
 
 
 	vga_adapter display(
