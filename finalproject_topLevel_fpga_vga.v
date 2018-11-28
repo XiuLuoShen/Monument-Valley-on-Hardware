@@ -6,20 +6,85 @@ module finalProject_Top(
 	input CLOCK_50,
 	output	[7:0] VGA_R, VGA_G, VGA_B,				// these might have to be [9:0], honestly not sure
 	output 	VGA_HS, VGA_VS, VGA_BLANK, VGA_SYNC, VGA_CLK,
-	output [9:0] LEDR
+	output [9:0] LEDR,
+	input [7:0] the_command,
+	input send_command,
+	inout PS2_CLK,
+	inout PS2_DAT
+//	output command_was_sent,
+//	output error_communication_timed_out,
+//	output [7:0] received_data,
+//	output received_data_en
 	);
 
 	wire resetn = KEY[0];
-	wire move = ~KEY[1];
+//	wire move = ~KEY[1];
 	wire activate = ~KEY[2];
 	wire resetnMonitor = KEY[3];
-	wire [1:0] dir = SW[1:0];
-	assign LEDR[3] = activate;			// LED to indicate when the board is being cleared/reset
+	wire resetKeyboard = ~KEY[3];
+
+	reg move;
+	reg [1:0] dir;
+//	assign LEDR[3] = activate;			// LED to indicate when the board is being cleared/reset
 
 	wire plot;
 	wire [2:0] color;
 	wire [8:0] X;
 	wire [7:0] Y;
+
+
+	// PS2 wires
+//	wire ps2_reset = reset;
+//	wire command = the_command;
+//	wire send_cmd = send_command;
+//	wire cmd_was_sent = command_was_sent;
+//	wire error_time_out = error_communication_timed_out;
+	
+	// PS2 output wires
+	wire [7:0] data;
+	wire data_en;
+	reg data_sent;
+	assign LEDR[0] = move;
+	assign LEDR[9:2] = data;
+
+
+	PS2_Controller Keyboard(
+		.CLOCK_50(CLOCK_50),
+		.reset(resetKeyboard),
+//		.the_command(the_command),
+//		.send_command(send_command),
+		.PS2_CLK(PS2_CLK),	// PS2 Clock
+	 	.PS2_DAT(PS2_DAT),	// PS2 Data
+//		.command_was_sent(command_was_sent),
+//		.error_communication_timed_out(error_communication_timed_out),
+		.received_data(data),
+		.received_data_en(data_en)
+	);
+
+	 wire clock2;
+	rateDivider r(
+		.clock(CLOCK_50),
+		.speed(2'b10),
+		.resetn(resetn),
+		.enableOut(clock2)
+	);
+
+	always @(posedge clock2, posedge data_en) begin
+		if (data_en == 1'b1) begin
+			move <= 1'b1;
+			if (data == 8'h1D) // UP; topleft
+			  	dir <= 2'b11;
+			else if (data == 8'h1C) // LEFT; bottomleft
+			  	dir <= 2'b01;
+			else if (data == 8'h1B) // DOWN; bottomright
+			  	dir <= 2'b00;
+			else if (data == 8'h23) // RIGHT; topright
+			  	dir <= 2'b10;
+//			else move <= 1'b0;
+		end
+		else
+			move <= 1'b0;
+	end
 
 	MonumentValley Game(
 		.clock(CLOCK_50),
