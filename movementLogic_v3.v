@@ -25,7 +25,7 @@ module moveSprite(
   wire [7:0] Y; // Y location of character
 
   moveSpriteControl C(
-	  .enable(enable),
+	 .enable(enable),
     .clock(clock),
     .resetn(resetn),
     .move(move),
@@ -124,7 +124,18 @@ module moveSpriteDataPath(
   reg [7:0] newY;
   reg teleport;
   reg pillarRaised; // Register to make sure the sprite rises due to the pillar only once
+  
+  /* 
 
+  Keyboard make codes
+
+  UP: 2  E0,75
+  LEFT: 0  E0,6B
+  DOWN: 1  E0,72
+  RIGHT: 3 E0,74
+
+  */
+  
   localparam
     DRAW_INITIAL = 4'd0,
     INITIAL = 4'd1,
@@ -192,6 +203,10 @@ module moveSpriteDataPath(
         else if (newY <= newX - 8'd52 && newY >= newX - 8'd63 && newX >= 8'd126 && newX <= 8'd177) begin // diagonal TL to BR
           if (newY >= 9'd289 - newX && newX <= 8'd176)
             validMove = 1'b0;
+          else if (gameState == FORMED_BRIDGE_1 || gameState == FORMED_BRIDGE_2 || gameState == FORMED_BRIDGE_3) begin // accounts for the path break
+            if (newY <= newX - 8'd26 && newX >= 8'd150)
+              validMove = 1'b0;
+          end
           else validMove = 1'b1;
 	       end
 
@@ -204,42 +219,69 @@ module moveSpriteDataPath(
           else validMove = 1'b1;
         end
 
-        // first button to moving platform
-
-        // skip this for now
-
-   //      else if (newY == 9'd282 - newX)	begin // [bottom diagonal] && [top diagonal]
-   //        if ((newX >= 8'd && newX <= 8'd) || (newX >= 8'd && newX <= 8'd))
-   //          validMove = 1'b1;
-			// end
-
-        // moving platform to island
+        // bridge to platform
         else if (newY <= newX - 8'd30 && newY >= newX - 8'd44 && newX >= 9'd152 && newX <= 9'd227)	begin
-          if (newY <= 9'd276 - newX && newX <= 8'd161)
+
+          if (gameState == FORMED_BRIDGE_1) begin           // first bridge is activated
+            if (newY <= 9'd276 - newX && newX <= 8'd161)
+              validMove = 1'b0;
+            else if (newY >= 9'd353 - newX && newX >= 8'd192)
+              validMove = 1'b0;
+            else validMove = 1'b1;
+          end
+
+          else if (gameState == FORMED_BRIDGE_2 || gameState == FORMED_BRIDGE_3) begin  // second bridge is activated
+            if (newY <= 9'd276 - newX && newX <= 8'd161)
+              validMove = 1'b0;
+            else if (newY >= 9'd353 - newX && newX >= 8'd192)
+              validMove = 1'b0;
+            else validMove = 1'b1;
+          end
+
+          else
             validMove = 1'b0;
-          else if (newY <= 9'd276 - newX && newX >= 8'd214) // change this
+	       end
+			 
+			 
+		// platform to island
+        else if (newY <= newX - 8'd30 && newY >= newX - 8'd44 && newX >= 9'd152 && newX <= 9'd227)	begin
+          if (newY <= 9'd336 - newX && newX <= 8'd192)
             validMove = 1'b0;
-          else if (gameState == FORMED_BRIDGE_1 || gameState == FORMED_BRIDGE_2 || gameState == FORMED_BRIDGE_3)
+          else if (newY >= 9'd401 - newX && newX >= 8'd214)
+            validMove = 1'b0;
+          else if (gameState == FORMED_BRIDGE_2 || gameState == FORMED_BRIDGE_3)
             validMove = 1'b1;
           else
             validMove = 1'b0;
 	       end
+			 
 
         // island
         else if (newY >= 9'd387 - newX && newY <= 9'd400 - newX && newX >= 8'd171 && newX <= 9'd227) begin
-            validMove = 1'b1;
-         end
+          if (newY <= newX - 8'd47 && newX >= 8'd217)
+            validMove = 1'b0;
+          else if (newY >= newX + 42 && newX <= 8'd179)
+            validMove = 1'b0;
+          else validMove = 1'b1;
+			end
 
         // island to first button again
         else if (newY <= newX + 8'd42 && newY >= newX + 8'd30 && newX >= 8'd116 && newX <= 8'd190)	begin
-          if (gameState == FORMED_BRIDGE_3)
-            validMove = 1'b1;
-	         end
+          if (newY <= 9'd274 - newX && newX >= 8'd124)
+            validMove = 1'b0;
+          else if (newY <= 9'd275 - newX && newX <= 8'd124)
+            validMove = 1'b0;
+			 else if (gameState == FORMED_BRIDGE_3)
+				validMove = 1'b1;
+          else validMove = 1'b0;
+			end
 
         // top of platform to original path
-        else if (newY <= 8'd220 - newX && newY >= 8'd203 - newX && newX >= 8'd116 && newX <= 8'd144)	begin
-            validMove = 1'b1;
-	         end
+        else if (newY <= 8'd217 - newX && newY >= 8'd203 - newX && newX >= 8'd116 && newX <= 8'd136)	begin
+          if (newY <= newX - 8'd32 && newX <= 8'd125)
+            validMove = 1'b0;
+          else validMove = 1'b1;
+			end
 
        // original path to end
         else if (newY <= 8'd215 - newX && newY >= 8'd208 - newX && newX >= 8'd129 && newX <= 8'd166) begin
