@@ -32,8 +32,8 @@ module getBackgroundPixel(
 	wire [2:0] pillarRisen;
 	PillarRisen bg4(.address(memoryAddress), .clock(clock), .q(pillarRisen));
 
-//	wire [2:0] finishGame;
-//	FinishedGame finished(.address(memoryAddress), .clock(clock), .q(finishGame));
+	wire [2:0] finishGame;
+	endgameImage finished(.address(memoryAddress), .clock(clock), .q(finishGame));
 	// ***************
 
 	localparam
@@ -59,7 +59,7 @@ module getBackgroundPixel(
 		UPDATE_BRIDGE_2, FORMED_BRIDGE_2:	color = bridge2;
 		UPDATE_BRIDGE_3, FORMED_BRIDGE_3:	color = bridge3;
 		UPDATE_PILLAR, PILLAR_RISED:	color = pillarRisen;
-		FINISHED_GAME:	color = 3'b111;
+		FINISHED_GAME:	color = finishGame;
 		default: color = original;
 	endcase
 	end

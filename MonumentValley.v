@@ -28,7 +28,7 @@ always @(*) begin
     plot = drawOnVGA_Animation;
   else if (drawMap)
     plot = drawOnVGA_Map;
-  else if (move)
+  else if (move && gameState != 4'd11)
     plot = drawOnVGA_Sprite;
   else
     plot = 1'b0;

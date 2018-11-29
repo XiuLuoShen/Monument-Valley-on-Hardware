@@ -4,7 +4,7 @@
 
 module spriteFSM(
 	input clock, resetn, move,
-	input [1:0] dir,
+	input [2:0] dir,
 	input [3:0] gameState,
 	input doneAnimation,
 
