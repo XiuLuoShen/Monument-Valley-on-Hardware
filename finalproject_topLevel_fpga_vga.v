@@ -11,10 +11,6 @@ module finalProject_Top(
 	input send_command,
 	inout PS2_CLK,
 	inout PS2_DAT
-//	output command_was_sent,
-//	output error_communication_timed_out,
-//	output [7:0] received_data,
-//	output received_data_en
 	);
 
 	wire resetn = KEY[0];
@@ -25,7 +21,6 @@ module finalProject_Top(
 
 	reg move;
 	reg [1:0] dir;
-//	assign LEDR[3] = activate;			// LED to indicate when the board is being cleared/reset
 
 	wire plot;
 	wire [2:0] color;
@@ -39,7 +34,7 @@ module finalProject_Top(
 //	wire send_cmd = send_command;
 //	wire cmd_was_sent = command_was_sent;
 //	wire error_time_out = error_communication_timed_out;
-	
+
 	// PS2 output wires
 	wire [7:0] data;
 	wire data_en;
@@ -51,39 +46,39 @@ module finalProject_Top(
 	PS2_Controller Keyboard(
 		.CLOCK_50(CLOCK_50),
 		.reset(resetKeyboard),
-//		.the_command(the_command),
-//		.send_command(send_command),
 		.PS2_CLK(PS2_CLK),	// PS2 Clock
 	 	.PS2_DAT(PS2_DAT),	// PS2 Data
-//		.command_was_sent(command_was_sent),
-//		.error_communication_timed_out(error_communication_timed_out),
 		.received_data(data),
 		.received_data_en(data_en)
 	);
 
-	 wire clock2;
-	rateDivider r(
-		.clock(CLOCK_50),
-		.speed(2'b10),
-		.resetn(resetn),
-		.enableOut(clock2)
-	);
+	//  wire clock2;
+	// rateDivider r(
+	// 	.clock(CLOCK_50),
+	// 	.speed(2'b10),
+	// 	.resetn(resetn),
+	// 	.enableOut(clock2)
+	// );
 
-	always @(posedge clock2, posedge data_en) begin
-		if (data_en == 1'b1) begin
-			move <= 1'b1;
-			if (data == 8'h1D) // UP; topleft
-			  	dir <= 2'b11;
-			else if (data == 8'h1C) // LEFT; bottomleft
-			  	dir <= 2'b01;
-			else if (data == 8'h1B) // DOWN; bottomright
-			  	dir <= 2'b00;
-			else if (data == 8'h23) // RIGHT; topright
-			  	dir <= 2'b10;
-//			else move <= 1'b0;
-		end
+
+	always @(*) begin
+		if (data_en == 1'b1)
+			move = 1'b1;
+		else if (data == 8'hF0)
+			move = 1'b0;
+	end
+
+	always @(*) begin
+		if (data == 8'h1D) // UP; topleft
+	  	dir = 2'b11;
+		else if (data == 8'h1C) // LEFT; bottomleft
+	  	dir = 2'b01;
+		else if (data == 8'h1B) // DOWN; bottomright
+  		dir = 2'b00;
+		else if (data == 8'h23) // RIGHT; topright
+	  	dir = 2'b10;
 		else
-			move <= 1'b0;
+			dir = 2'b00;
 	end
 
 	MonumentValley Game(
