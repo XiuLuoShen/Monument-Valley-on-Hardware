@@ -4,7 +4,7 @@
 // MODULE: altsyncram 
 
 // ============================================================
-// File Name: BG_original.v
+// File Name: Bridge3Formed.v
 // Megafunction Name(s):
 // 			altsyncram
 //
@@ -36,7 +36,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module BG_original (
+module Bridge3Formed (
 	address,
 	clock,
 	q);
@@ -83,7 +83,7 @@ module BG_original (
 		altsyncram_component.address_aclr_a = "NONE",
 		altsyncram_component.clock_enable_input_a = "BYPASS",
 		altsyncram_component.clock_enable_output_a = "BYPASS",
-		altsyncram_component.init_file = "original.mif",
+		altsyncram_component.init_file = "bridge3.mif",
 		altsyncram_component.intended_device_family = "Cyclone V",
 		altsyncram_component.lpm_hint = "ENABLE_RUNTIME_MOD=NO",
 		altsyncram_component.lpm_type = "altsyncram",
@@ -118,7 +118,7 @@ endmodule
 // Retrieval info: PRIVATE: JTAG_ENABLED NUMERIC "0"
 // Retrieval info: PRIVATE: JTAG_ID STRING "NONE"
 // Retrieval info: PRIVATE: MAXIMUM_DEPTH NUMERIC "0"
-// Retrieval info: PRIVATE: MIFfilename STRING "original.mif"
+// Retrieval info: PRIVATE: MIFfilename STRING "bridge3.mif"
 // Retrieval info: PRIVATE: NUMWORDS_A NUMERIC "57600"
 // Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "0"
 // Retrieval info: PRIVATE: RegAddr NUMERIC "1"
@@ -133,7 +133,7 @@ endmodule
 // Retrieval info: CONSTANT: ADDRESS_ACLR_A STRING "NONE"
 // Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_A STRING "BYPASS"
 // Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_A STRING "BYPASS"
-// Retrieval info: CONSTANT: INIT_FILE STRING "original.mif"
+// Retrieval info: CONSTANT: INIT_FILE STRING "bridge3.mif"
 // Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone V"
 // Retrieval info: CONSTANT: LPM_HINT STRING "ENABLE_RUNTIME_MOD=NO"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "altsyncram"
@@ -150,10 +150,10 @@ endmodule
 // Retrieval info: CONNECT: @address_a 0 0 16 0 address 0 0 16 0
 // Retrieval info: CONNECT: @clock0 0 0 0 0 clock 0 0 0 0
 // Retrieval info: CONNECT: q 0 0 3 0 @q_a 0 0 3 0
-// Retrieval info: GEN_FILE: TYPE_NORMAL BG_original.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL BG_original.inc FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL BG_original.cmp FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL BG_original.bsf FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL BG_original_inst.v FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL BG_original_bb.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL Bridge3Formed.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL Bridge3Formed.inc FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL Bridge3Formed.cmp FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL Bridge3Formed.bsf FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL Bridge3Formed_inst.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL Bridge3Formed_bb.v FALSE
 // Retrieval info: LIB_FILE: altera_mf

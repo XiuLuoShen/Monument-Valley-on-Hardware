@@ -4,8 +4,9 @@
 
 module spriteFSM(
 	input clock, resetn, move,
-	input [1:0] dir,
+	input [2:0] dir,
 	input [3:0] gameState,
+	input doneAnimation,
 
 	// output below is sent to gameState so it knows where the character is
 	output [8:0] x_pos,
@@ -31,6 +32,7 @@ module spriteFSM(
 		.gameState(gameState),
 		.doneChar(doneDraw),
 		.doneBG(doneDraw),
+		.doneAnimation(doneAnimation),
 		.dir(dir),
 		.drawChar(drawChar),
 		.drawBG(drawBG),
